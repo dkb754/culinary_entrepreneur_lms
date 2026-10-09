@@ -76,25 +76,6 @@ function withSuffix(name: string, suffix: string): string {
   return ext ? `${name.slice(0, -(ext.length + 1))}${suffix}.${ext}` : name + suffix;
 }
 
-const json = (status: number, body: unknown) =>
-  new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
-
-class HttpError extends Error { constructor(public status: number, public code: string) { super(code); } }
-
-const slug = (s: string) =>
-  s.normalize("NFKD").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "x";
-const extOf = (n: string) => (/\.([A-Za-z0-9]+)$/.exec(n)?.[1] || "").toLowerCase();
-function safeName(n: string): string {
-  const ext = extOf(n);
-  const base = n.replace(/\.[^.]*$/, "").replace(/[^A-Za-z0-9._-]+/g, "_").replace(/^[._]+/, "").slice(0, 60) || "file";
-  return ext ? `${base}.${ext}` : base;
-}
-function withSuffix(name: string, suffix: string): string {
-  const ext = extOf(name);
-  return ext ? `${name.slice(0, -(ext.length + 1))}${suffix}.${ext}` : name + suffix;
-}
-
-
 // ---------- progress rows ----------
 type Row = Record<string, any>;
 const EMPTY_PATCH = () => ({
