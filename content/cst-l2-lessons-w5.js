@@ -19,7 +19,7 @@ LESSONS.w5d1 = `<h4>PART 1 — The problem your food business solves</h4>
 <li><strong>How</strong> do you sell it? (Food truck, market stall, online orders, a small shop, delivery.)</li>
 <li><strong>Why</strong> will they choose you? (Fresh, fast, family recipe, healthy, low price.)</li>
 </ul>
-<p>Here is an example, with made-up details: "Sunday Table makes ready-to-heat family dinners for busy parents. Customers order online by Thursday and pick up on Saturday. Every meal uses fresh ingredients and feeds four people, so dinner is solved for the week."</p>
+<p>Here is an example, with made-up details: "Sunday Table makes ready-to-heat family dinners for busy parents. Customers order online by Thursday and pick up on Friday. Every meal uses fresh ingredients and feeds four people, so dinner is solved for the week."</p>
 <p>Notice what the example does not do. It does not use big words, and it does not try to sell to everyone. Write your first version fast, then cut every word that is not needed. If a stranger could read it and repeat it back to you, it is working. It is normal to rewrite it many times as you learn more.</p>
 
 <h4>PART 3 — What makes you different</h4>

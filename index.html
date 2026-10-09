@@ -2144,7 +2144,7 @@ function updateProgress() {
     const d = items.filter(itemDone).length;
     const complete = items.length > 0 && d === items.length;
     const locked = !weekUnlocked(w);
-    if (!locked && !complete && !currentWeek) currentWeek = w;
+    if (!locked) currentWeek = w; // the furthest week the learner has opened
 
     document.getElementById('wc' + w + '-bar').style.width = (items.length ? Math.round(d / items.length * 100) : 0) + '%';
     document.getElementById('wc' + w + '-count').textContent = locked ? (w === 5 ? 'Opens after Level I is done' : 'Opens after you pass ' + weekLabel(w - 1) + ' quizzes') : d + ' of ' + items.length + ' items done';
@@ -2188,7 +2188,7 @@ function updateProgress() {
   document.getElementById('global-pct').textContent = pct + '%';
   document.getElementById('global-label').textContent = 'Course Progress · ' + passed + ' quizzes passed · ' + filed + ' deliverables submitted';
 
-  const lastOpen = currentWeek || WEEKS[WEEKS.length - 1];
+  const lastOpen = currentWeek || 1;
   document.getElementById('stat-week').textContent = weekLabel(lastOpen).replace('Level II · Week ', 'II·');
   const cw = document.getElementById('cur-week'); if (cw) cw.textContent = weekLabel(lastOpen);
   document.getElementById('stat-quizzes').textContent = passed + '/' + open.length;

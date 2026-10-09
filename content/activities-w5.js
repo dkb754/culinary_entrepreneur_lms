@@ -27,7 +27,7 @@ ACTIVITIES.w5d1 = {
     {
       type: 'choice', title: 'Is it a strong concept statement?',
       items: [
-        { q: 'Which concept statement is the strongest?', opts: ['We make ready-to-heat family dinners for busy parents. Orders are online and pickup is on Saturday.', 'We sell food to everyone at great prices.', 'Our restaurant is the best in town.', 'We are passionate about quality and excellence.'], ans: 0, why: 'It names what, who and how in plain words. The others are vague.' },
+        { q: 'Which concept statement is the strongest?', opts: ['We make ready-to-heat family dinners for busy parents. Orders are online and pickup is on Friday.', 'We sell food to everyone at great prices.', 'Our restaurant is the best in town.', 'We are passionate about quality and excellence.'], ans: 0, why: 'It names what, who and how in plain words. The others are vague.' },
         { q: 'How long should a concept statement be?', opts: ['Two or three sentences', 'Ten pages', 'One word', 'As long as your menu'], ans: 0, why: 'A short statement is easier to remember and repeat.' },
         { q: 'You finish your first version. What should you do next?', opts: ['Cut every word that is not needed', 'Add more big words', 'Never change it again', 'Hide it until you open'], ans: 0, why: 'Write fast, then trim. Rewriting many times as you learn is normal.' },
       ],
@@ -268,7 +268,7 @@ ACTIVITIES.w5d4 = {
         { key: 'diff', label: 'What makes you different, and what is one fact from your research?', help: 'Use a real fact or label it as an estimate.', minWords: 12, rows: 4,
           keywords: [{ match: 'different|unlike|only|but', tip: 'what sets you apart' }, { match: 'estimate|found|five|three|nearby|\\d', tip: 'a fact or labeled estimate' }] },
       ],
-      model: 'Sunday Table makes ready-to-heat family dinners for busy parents who order online and pick up on Saturday. Unlike the nearby places I visited, which sell only single meals, we sell a full dinner for four, and my estimate is that most families near me have no such option.',
+      model: 'Sunday Table makes ready-to-heat family dinners for busy parents who order online and pick up on Friday. Unlike the nearby places I visited, which sell only single meals, we sell a full dinner for four, and my estimate is that most families near me have no such option.',
     },
   ],
   p4: [

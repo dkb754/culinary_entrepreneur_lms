@@ -1,11 +1,11 @@
-# Automated pre-deploy gate. Netlify deploys whatever lands on `main`, so `main` only ever gets a PR from `staging` whose
-# every automated test passed. There are NO manual steps: read the pass/fail table at the top of each run's Summary page.
+# Automated pre-deploy gate. Netlify deploys whatever lands on `main` (OCWB cohort site) and on `cst-async` (self-paced site).
+# `main` only gets a PR from `staging`, and `cst-async` only gets a PR from `cst-async-staging`, and only when every automated test passed. There are NO manual steps: read the pass/fail table at the top of each run's Summary page.
 name: CI
 on:
   push:
-    branches: [main, staging]
+    branches: [main, staging, cst-async, cst-async-staging]
   pull_request:
-    branches: [main, staging]
+    branches: [main, staging, cst-async, cst-async-staging]
 
 permissions:
   contents: read
@@ -82,6 +82,7 @@ jobs:
           eval "$(supabase status -o env)"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -q -f tests/backend/seed.sql > /dev/null
           API_URL="$API_URL" DB_URL="$DB_URL" ANON_KEY="$ANON_KEY" node tools/backend-tests.mjs
+          API_URL="$API_URL" DB_URL="$DB_URL" ANON_KEY="$ANON_KEY" node tools/backend-tests-async.mjs
       - name: Function log (on failure)
         if: failure()
         run: tail -80 functions.log || true
@@ -110,8 +111,8 @@ jobs:
         run: python3 tools/combine-results.py
 
   release-gate:
-    name: Release gate (only staging, only when every test passed)
-    if: always() && github.event_name == 'pull_request' && github.base_ref == 'main'
+    name: Release gate (only from the matching staging branch, only when every test passed)
+    if: always() && github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'cst-async')
     needs: [tests-passed]
     runs-on: ubuntu-latest
     permissions:
@@ -123,15 +124,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TESTS: ${{ needs.tests-passed.result }}
           HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
           PR: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
         run: |
           reason=""
-          [ "$HEAD_REF" != "staging" ] && reason="Only the \`staging\` branch may be merged into \`main\` (this PR is from \`$HEAD_REF\`)."
+          want=staging; [ "$BASE_REF" = "cst-async" ] && want=cst-async-staging
+          [ "$HEAD_REF" != "$want" ] && reason="Only the \`$want\` branch may be merged into \`$BASE_REF\` (this PR is from \`$HEAD_REF\`)."
           [ -z "$reason" ] && [ "$TESTS" != "success" ] && reason="The automated tests did not all pass on this commit. See the run Summary for the failing area."
           if [ -n "$reason" ]; then
             gh pr close "$PR" --repo "$REPO" --comment "🚫 **Release gate:** $reason The PR has been closed automatically. Fix the failure on \`staging\`; when every test is green, open the PR again."
             echo "## ❌ Release gate: PR closed" >> "$GITHUB_STEP_SUMMARY"; echo "$reason" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
-          echo "## ✅ Release gate: staging → main is allowed (all automated tests passed)" >> "$GITHUB_STEP_SUMMARY"
+          echo "## ✅ Release gate: $HEAD_REF → $BASE_REF is allowed (all automated tests passed)" >> "$GITHUB_STEP_SUMMARY"
