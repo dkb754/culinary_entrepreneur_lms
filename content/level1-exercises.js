@@ -1,4 +1,4 @@
-/* Week 1, Wednesday (w1d3): three scaling exercises of increasing difficulty. The page shows the prompts; the ANSWERS live only
+/* Week 1, Day 3 (w1d3): three scaling exercises of increasing difficulty. The page shows the prompts; the ANSWERS live only
  * on the server (supabase/functions/lms-api-v2, EXERCISES) and are graded there, so a student cannot read them from the page.
  * Keep the `key`s here identical to the keys there. */
 const EXERCISES = [

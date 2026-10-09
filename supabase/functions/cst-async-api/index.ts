@@ -1,10 +1,12 @@
-// POST /functions/v1/lms-api-v2   { token, action, ...args }
-// Level I curriculum API (Culinary Entrepreneurship I, Fall 2026). Supersedes lms-api, which stays deployed only
-// until the new page is live. The browser never touches tables or the bucket directly; identity always comes
-// from the server-side session (token -> student_name), never from the request body.
-//   student: load, save, create-upload, record-submission, set-checkin, submit-exercise, save-activity, logout
-//   admin:   admin-overview, admin-unlock, admin-file-url, admin-set-attendance, admin-set-servsafe,
-//            admin-save-rubric, admin-set-published
+// POST /functions/v1/cst-async-api   { token, action, ...args }
+// API for "Culinary Systems Training — Self-Paced" (free, online-only, no labs, no cohort calendar).
+// Same architecture as lms-api-v2: the browser never touches tables or the bucket; identity comes from the server session.
+// Sessions opened with an async code carry level 'cst-async'; any other session is refused (and cohort sessions cannot
+// reach this API's data, nor can async sessions reach lms-api-v2).
+//   student: load, save, create-upload, record-submission, submit-exercise, save-activity, set-checkin, logout
+//   admin:   admin-overview, admin-create-student, admin-unlock, admin-set-published, admin-file-url
+// Gates are PROGRESS-BASED and computed here: Week 1 is open; Week N+1 opens when every quiz of Week N is passed (70%+).
+// Level II (Weeks 5-8) additionally needs the Concept Brief submitted. No instructor action is required (admin-unlock is an optional override).
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
@@ -14,29 +16,34 @@ const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SE
 const BUCKET = "submissions";
 const MAX_BYTES = 25 * 1024 * 1024;
 const PASS_MARK = 70;
-const LEVEL = "L1";
-const COHORT = "L1-F2026"; // rows from any other cohort are archived and reset the first time that student signs in
+const LEVEL = "cst-async";
+const PUBLISHED_KEY = "cst_async_published";
 
-// Keep in sync with CURRICULUM in index.html. `krp` = also recorded in student_progress.krp_portfolio.
+// Keep in sync with content/level1.js and content/cst-level2.js. `krp` = also recorded in student_progress.krp_portfolio.
 const FILE_ASSIGNMENTS: Record<string, { label: string; krp?: string }> = {
   w1d4: { label: "Honest Map", krp: "honest_map" },
   w2d3: { label: "Professional Identity Statement", krp: "identity_statement" },
   w3d4: { label: "Recipe Cost Sheet" },
-  w3lab: { label: "Costed Recipe Card" },
-  w4d3: { label: "Concept Brief Draft" },
+  w4d3: { label: "Concept Brief" },
   w4d4: { label: "KRP Portfolio", krp: "portfolio" },
-  w4lab: { label: "Concept Brief" },
+  w6d4: { label: "Business Plan" },
+  w8d4: { label: "Operating Plan" },
 };
-const QUIZ_IDS = [
-  "w1d1", "w1d2", "w1d3", "w1d4", "w2d1", "w2d2", "w2d3", "w2d4", "w3d1", "w3d2", "w3d3", "w3d4", "w4d1", "w4d2",
-];
+// Quizzes per week (weeks 1-4 = Level I, 5-8 = Level II)
+const WEEK_QUIZZES: Record<number, string[]> = {
+  1: ["w1d1", "w1d2", "w1d3", "w1d4"], 2: ["w2d1", "w2d2", "w2d3", "w2d4"], 3: ["w3d1", "w3d2", "w3d3", "w3d4"], 4: ["w4d1", "w4d2"],
+  5: ["w5d1", "w5d2", "w5d3", "w5d4"], 6: ["w6d1", "w6d2", "w6d3", "w6d4"], 7: ["w7d1", "w7d2", "w7d3", "w7d4"], 8: ["w8d1", "w8d2", "w8d3", "w8d4"],
+};
+const QUIZ_IDS = Object.values(WEEK_QUIZZES).flat();
+const L1_QUIZ_IDS = [1, 2, 3, 4].flatMap((w) => WEEK_QUIZZES[w]);
+const FINAL_L1_QUIZ = "w4d2"; // "Level I Quiz 14": the 90-day check-in clock starts when this is first passed
+const CAPSTONE = "w4d3";       // Concept Brief
 // Week 1 scaling exercises: key -> [correct answer, tolerance]. Keep keys in sync with content/level1-exercises.js.
 const EXERCISES: Record<string, Record<string, [number, number]>> = {
   ex1: { factor: [6, 0.001], oil: [24, 0.01], vinegar: [12, 0.01], dijon: [6, 0.01], salt: [6, 0.01] },
   ex2: { factor: [0.25, 0.001], onion: [2, 0.01], stock: [2.5, 0.01], cream: [0.5, 0.01], cream_cups: [2, 0.01] },
   ex3: { factor: [2.5, 0.001], onion_ep: [7.5, 0.01], onion_ap: [8.52, 0.05], chicken_ep: [11.25, 0.01], chicken_ap: [15, 0.05] },
 };
-const LABS = ["lab1", "lab2", "lab3", "lab4"];
 const EXT_MIME: Record<string, string> = {
   pdf: "application/pdf", doc: "application/msword",
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -46,14 +53,6 @@ const EXT_MIME: Record<string, string> = {
   pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   csv: "text/csv", txt: "text/plain", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", zip: "application/zip",
 };
-// CST Module 1 rubric: 25 criteria x 4 pts = 100. Section 4 has six criteria (three named in the brief + three proposed).
-const RUBRIC_KEYS = [
-  ...[1, 2, 3, 4, 5].map((i) => `s1_${i}`),
-  ...[1, 2, 3, 4, 5, 6, 7, 8].map((i) => `s2_${i}`),
-  ...[1, 2, 3, 4, 5, 6].map((i) => `s3_${i}`),
-  ...[1, 2, 3, 4, 5, 6].map((i) => `s4_${i}`),
-];
-
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "content-type, authorization, apikey, x-client-info",
@@ -81,16 +80,35 @@ function withSuffix(name: string, suffix: string): string {
 type Row = Record<string, any>;
 const EMPTY_PATCH = () => ({
   quizzes: {}, deliverables: {}, w2_unlocked: false, krp_portfolio: {}, lab_attendance: {}, servsafe: {},
-  is_l2_eligible: false, exercises: {}, checkin_opt_in: false, checkin_email: null, checkin_sent_at: null,
+  is_l2_eligible: false, exercises: {}, checkin_opt_in: false, checkin_email: null, checkin_sent_at: null, unlock_through: 0,
 });
-const toProgress = (r: Row | null | undefined) => ({
-  quizzes: r?.quizzes || {}, deliverables: r?.deliverables || {}, w2_unlocked: !!r?.w2_unlocked,
-  krp_portfolio: r?.krp_portfolio || {}, lab_attendance: r?.lab_attendance || {}, servsafe: r?.servsafe || {},
-  is_l2_eligible: !!r?.is_l2_eligible, exercises: r?.exercises || {},
-  checkin: { opt_in: !!r?.checkin_opt_in, email: r?.checkin_email || "", sent: !!r?.checkin_sent_at },
-});
-// A row that belongs to an earlier cohort is shown as empty everywhere until the student signs in and it is archived.
-const view = (r: Row | undefined) => (r && r.cohort === COHORT ? toProgress(r) : toProgress(null));
+const weekOf = (id: string) => Number(/^(?:a_)?w([1-8])d[1-4]/.exec(id)?.[1] || 0);
+
+// ---------- gates (all progress-based; computed here, never trusted from the browser) ----------
+const passedAll = (q: Record<string, any>, ids: string[]) => ids.every((id) => !!q[id]?.passed);
+function readyForL2(r: Row): boolean {
+  return passedAll(r.quizzes || {}, L1_QUIZ_IDS) && !!r.deliverables?.[CAPSTONE]?.submitted;
+}
+function unlockedWeeks(r: Row): number[] {
+  const q = r.quizzes || {};
+  const out = [1];
+  for (let n = 2; n <= 8; n++) {
+    const open = out.includes(n - 1) && passedAll(q, WEEK_QUIZZES[n - 1]) && (n !== 5 || readyForL2(r));
+    if (open || n <= (r.unlock_through || 0)) out.push(n);
+  }
+  return out;
+}
+const toProgress = (r: Row | null | undefined) => {
+  const row = r || {};
+  const q = row.quizzes || {};
+  const weeks = unlockedWeeks(row);
+  return {
+    quizzes: q, deliverables: row.deliverables || {}, krp_portfolio: row.krp_portfolio || {}, exercises: row.exercises || {},
+    unlocked_weeks: weeks, ready_l2: readyForL2(row),
+    l1_done: passedAll(q, L1_QUIZ_IDS), unlock_through: row.unlock_through || 0,
+    checkin: { opt_in: !!row.checkin_opt_in, email: row.checkin_email || "", sent: !!row.checkin_sent_at },
+  };
+};
 
 async function getRow(name: string) {
   const { data, error } = await sb.from("student_progress").select("*").eq("student_name", name).maybeSingle();
@@ -107,61 +125,40 @@ async function ensureRow(name: string): Promise<Row> {
   let row = await getRow(name);
   if (!row) {
     const ins = await sb.from("student_progress")
-      .insert({ student_name: name, ...EMPTY_PATCH(), level: LEVEL, cohort: COHORT }).select().single();
+      .insert({ student_name: name, ...EMPTY_PATCH(), level: LEVEL, cohort: LEVEL }).select().single();
     if (ins.error) { row = await getRow(name); if (!row) throw ins.error; } else return ins.data as Row;
   }
-  if (row.cohort !== COHORT) {
-    // Earlier cohort's data is preserved in the archive table, then the row starts clean for this cohort.
-    // Idempotent: parallel first requests must not archive the same old row twice.
-    const dup = await sb.from("student_progress_archive").select("id", { count: "exact", head: true })
-      .eq("student_name", name).eq("row_data->>id", String(row.id));
-    if (dup.error) throw dup.error;
-    if (!dup.count) {
-      const arch = await sb.from("student_progress_archive")
-        .insert({ student_name: name, reason: `cohort rollover to ${COHORT}`, row_data: row });
-      if (arch.error) throw arch.error;
-    }
-    row = await writeRow(name, { ...EMPTY_PATCH(), level: LEVEL, cohort: COHORT });
-  }
+  if (row.level !== LEVEL) throw new HttpError(409, "wrong_product"); // a cohort student's row is never touched from here
   return row;
 }
 
-function eligible(r: Row): boolean {
-  const q = r.quizzes || {};
-  return r.servsafe?.exam_result === "passed" && !!r.deliverables?.w4lab && QUIZ_IDS.every((id) => q[id]?.passed);
-}
-
 async function getPublished(): Promise<string[]> {
-  const { data, error } = await sb.from("lms_settings").select("value").eq("key", "published_quizzes").maybeSingle();
+  const { data, error } = await sb.from("lms_settings").select("value").eq("key", PUBLISHED_KEY).maybeSingle();
   if (error) throw error;
   return Array.isArray(data?.value) ? (data!.value as string[]) : [];
 }
 
-function mergeQuizzes(cur: Record<string, any>, inc: unknown, published: string[]) {
+function mergeQuizzes(cur: Record<string, any>, inc: unknown, published: string[], weeks: number[]) {
   const out = { ...cur };
   if (inc && typeof inc === "object") {
     for (const [k, v] of Object.entries(inc as Record<string, any>)) {
-      if (!QUIZ_IDS.includes(k) || !published.includes(k)) continue; // only published quizzes can be scored
+      if (!QUIZ_IDS.includes(k) || !published.includes(k) || !weeks.includes(weekOf(k))) continue; // published, unlocked quizzes only
       const score = Number((v as any)?.score);
       if (!Number.isFinite(score) || score < 0 || score > 100) continue;
-      const rec = {
+      const rec: Record<string, unknown> = {
         score: Math.round(score), passed: score >= PASS_MARK,
         correct: Number.isInteger((v as any)?.correct) ? (v as any).correct : undefined,
         total: Number.isInteger((v as any)?.total) ? (v as any).total : undefined,
       };
       const c = out[k];
-      if (!c || (rec.passed && !c.passed) || (rec.passed === !!c.passed && rec.score > c.score)) out[k] = rec;
+      if (!c || (rec.passed && !c.passed) || (rec.passed === !!c.passed && rec.score > c.score)) {
+        // `at` = when the quiz was first passed; the 90-day check-in counts from it (Level I final quiz)
+        const at = rec.passed ? (c?.passed && c.at ? c.at : new Date().toISOString()) : undefined;
+        out[k] = at ? { ...rec, at } : rec;
+      }
     }
   }
   return out;
-}
-
-const band = (total: number) => (total >= 80 ? "Pass" : total >= 70 ? "Conditional" : "Remediation required");
-
-async function studentCst(name: string) {
-  const { data, error } = await sb.from("cst_rubric_scores").select("lab,total,band,scores,scored_at").eq("student_name", name);
-  if (error) throw error;
-  return (data || []).map((r) => ({ lab: r.lab, total: r.total, band: r.band, scored_at: r.scored_at }));
 }
 
 // ---------- handler ----------
@@ -178,17 +175,18 @@ Deno.serve(async (req) => {
     const { data: sess, error: sErr } = await sb.rpc("lms_session", { p_token: token });
     if (sErr) throw sErr;
     if (!sess) return json(401, { error: "session_expired" });
-    if (sess.level === "cst-async") return json(403, { error: "wrong_product" }); // self-paced CST sessions never reach cohort data
+    if (sess.level !== LEVEL) return json(403, { error: "wrong_product" });
     const user: string = sess.student_name;
     const isAdmin: boolean = !!sess.is_admin;
     const needStudent = () => { if (isAdmin) throw new HttpError(403, "admin_preview"); };
     const needAdmin = () => { if (!isAdmin) throw new HttpError(403, "forbidden"); };
     const target = async () => {
       const name = String(body.student_name || "");
-      const ok = await sb.from("student_access_codes").select("student_name").eq("student_name", name).eq("is_admin", false).neq("level", "cst-async").maybeSingle();
+      const ok = await sb.from("student_access_codes").select("student_name").eq("student_name", name).eq("is_admin", false).eq("level", LEVEL).maybeSingle();
       if (!ok.data) throw new HttpError(404, "unknown_student");
       return name;
     };
+    const needWeek = (row: Row, week: number) => { if (!unlockedWeeks(row).includes(week)) throw new HttpError(403, "week_locked"); };
 
     switch (action) {
       case "logout": {
@@ -198,17 +196,20 @@ Deno.serve(async (req) => {
 
       case "load": {
         const published = await getPublished();
-        if (isAdmin) return json(200, { progress: toProgress(null), is_admin: true, settings: { published_quizzes: published }, cst: [] });
+        if (isAdmin) {
+          const p = toProgress(null); p.unlocked_weeks = [1, 2, 3, 4, 5, 6, 7, 8]; // instructor preview: everything readable
+          return json(200, { progress: p, is_admin: true, settings: { published_quizzes: published } });
+        }
         const row = await ensureRow(user);
-        return json(200, { progress: toProgress(row), settings: { published_quizzes: published }, cst: await studentCst(user) });
+        return json(200, { progress: toProgress(row), settings: { published_quizzes: published } });
       }
 
       case "save": {
         needStudent();
         const row = await ensureRow(user);
-        const quizzes = mergeQuizzes(row.quizzes || {}, body.quizzes, await getPublished());
+        const quizzes = mergeQuizzes(row.quizzes || {}, body.quizzes, await getPublished(), unlockedWeeks(row));
         const next = { ...row, quizzes };
-        const saved = await writeRow(user, { quizzes, is_l2_eligible: eligible(next) });
+        const saved = await writeRow(user, { quizzes, is_l2_eligible: readyForL2(next) });
         return json(200, { progress: toProgress(saved) });
       }
 
@@ -217,6 +218,7 @@ Deno.serve(async (req) => {
         const id = String(body.assignment || "");
         const a = FILE_ASSIGNMENTS[id];
         if (!a) throw new HttpError(400, "unknown_assignment");
+        needWeek(await ensureRow(user), weekOf(id));
         const filename = String(body.filename || "");
         const ext = extOf(filename);
         if (!EXT_MIME[ext]) throw new HttpError(400, "file_type_not_allowed");
@@ -224,7 +226,7 @@ Deno.serve(async (req) => {
         if (!Number.isFinite(size) || size <= 0) throw new HttpError(400, "empty_file");
         if (size > MAX_BYTES) throw new HttpError(413, "file_too_large");
 
-        const dir = `${LEVEL}/${slug(user)}/${slug(a.label)}`;
+        const dir = `${LEVEL}/${slug(user)}/${slug(a.label)}`; // cst-async/{student}/{assignment}/
         const listed = await sb.storage.from(BUCKET).list(dir, { limit: 1000 });
         if (listed.error) throw listed.error;
         const taken = new Set((listed.data || []).map((o) => o.name));
@@ -243,6 +245,7 @@ Deno.serve(async (req) => {
         const id = String(body.assignment || "");
         const a = FILE_ASSIGNMENTS[id];
         if (!a) throw new HttpError(400, "unknown_assignment");
+        needWeek(await ensureRow(user), weekOf(id));
         const path = String(body.path || "");
         const dir = `${LEVEL}/${slug(user)}/${slug(a.label)}`;
         if (!path.startsWith(dir + "/") || path.includes("..") || path.slice(dir.length + 1).includes("/"))
@@ -278,7 +281,7 @@ Deno.serve(async (req) => {
         const deliverables = { ...(row.deliverables || {}), [id]: rec };
         const patch: Row = { deliverables };
         if (a.krp) patch.krp_portfolio = { ...(row.krp_portfolio || {}), [a.krp]: { date: rec.date, fileName: rec.fileName, filePath: rec.filePath, attempts: rec.attempts } };
-        patch.is_l2_eligible = eligible({ ...row, deliverables });
+        patch.is_l2_eligible = readyForL2({ ...row, deliverables });
         const saved = await writeRow(user, patch);
         return json(200, { record: rec, progress: toProgress(saved) });
       }
@@ -309,7 +312,7 @@ Deno.serve(async (req) => {
 
       case "save-activity": { // lesson activities are graded in the browser (practice); the server keeps best score, attempts and written answers
         const id = String(body.id || "");
-        if (!/^a_w[1-4](d[1-4]|lab)_(intro|p[1-4]|end)(_[0-9]{1,2})?$/.test(id)) throw new HttpError(400, "unknown_activity");
+        if (!/^a_w[1-8]d[1-4]_(intro|p[1-4]|end)(_[0-9]{1,2})?$/.test(id)) throw new HttpError(400, "unknown_activity");
         const score = Math.round(Number(body.score));
         if (!Number.isFinite(score) || score < 0 || score > 100) throw new HttpError(400, "bad_score");
         let text: Record<string, string> | undefined;
@@ -321,8 +324,9 @@ Deno.serve(async (req) => {
         }
         if (isAdmin) return json(200, { ok: true }); // instructor preview: nothing recorded
         const row = await ensureRow(user);
+        needWeek(row, weekOf(id));
         const cur = row.exercises || {};
-        if (!cur[id] && Object.keys(cur).filter((k) => k.startsWith("a_")).length >= 150) throw new HttpError(400, "too_many_activities");
+        if (!cur[id] && Object.keys(cur).filter((k) => k.startsWith("a_")).length >= 300) throw new HttpError(400, "too_many_activities");
         const prev = cur[id];
         const rec: Record<string, unknown> = {
           passed: !!(prev?.passed || score >= 70), best: Math.max(prev?.best || 0, score), attempts: (prev?.attempts || 0) + 1,
@@ -345,80 +349,45 @@ Deno.serve(async (req) => {
 
       case "admin-overview": {
         needAdmin();
-        const [rows, subs, roster, rubrics, published] = await Promise.all([
-          sb.from("student_progress").select("*").neq("level", "cst-async"),
-          sb.from("submissions").select("*").not("file_path", "like", "cst-async/%").order("submitted_at", { ascending: false }).limit(2000),
-          sb.from("student_access_codes").select("student_name,level").eq("is_admin", false).neq("level", "cst-async").order("student_name"),
-          sb.from("cst_rubric_scores").select("*"),
+        const [rows, subs, roster, published] = await Promise.all([
+          sb.from("student_progress").select("*").eq("level", LEVEL),
+          sb.from("submissions").select("*").like("file_path", `${LEVEL}/%`).order("submitted_at", { ascending: false }).limit(2000),
+          sb.from("student_access_codes").select("student_name").eq("is_admin", false).eq("level", LEVEL).order("student_name"),
           getPublished(),
         ]);
-        for (const r of [rows, subs, roster, rubrics]) if (r.error) throw r.error;
+        for (const r of [rows, subs, roster]) if (r.error) throw r.error;
         const progress: Record<string, unknown> = {};
-        for (const r of rows.data || []) progress[r.student_name] = view(r);
+        for (const r of rows.data || []) progress[r.student_name] = toProgress(r);
         return json(200, {
-          roster: (roster.data || []).map((r) => r.student_name), levels: Object.fromEntries((roster.data || []).map((r) => [r.student_name, r.level])),
-          progress, submissions: subs.data || [], rubrics: rubrics.data || [], settings: { published_quizzes: published },
+          roster: (roster.data || []).map((r) => r.student_name), progress, submissions: subs.data || [],
+          settings: { published_quizzes: published },
         });
       }
 
-      case "admin-unlock": {
+      case "admin-create-student": { // the instructor provisions access codes by hand; the code is stored hashed and never echoed
         needAdmin();
-        const name = await target();
+        const name = String(body.student_name || "").trim();
+        const code = String(body.access_code || "").trim();
+        if (!/^[A-Za-z][A-Za-z .'-]{1,59}$/.test(name)) throw new HttpError(400, "bad_name");
+        if (!/^[A-Za-z0-9-]{6,40}$/.test(code)) throw new HttpError(400, "bad_code");
+        const { error } = await sb.rpc("lms_set_code_level", { p_name: name, p_code: code, p_admin: false, p_level: LEVEL });
+        if (error) {
+          if (String(error.message).includes("name_belongs_to_other_product")) throw new HttpError(409, "name_taken");
+          if (String(error.message).includes("duplicate key")) throw new HttpError(409, "code_taken");
+          throw error;
+        }
         await ensureRow(name);
-        await writeRow(name, { w2_unlocked: true });
-        return json(200, { ok: true });
+        return json(200, { ok: true, student_name: name });
       }
 
-      case "admin-set-attendance": {
+      case "admin-unlock": { // optional override: open Weeks 1..N for one student (normally unnecessary: gates are automatic)
         needAdmin();
         const name = await target();
-        const lab = String(body.lab || "");
-        if (!LABS.includes(lab)) throw new HttpError(400, "unknown_lab");
-        const row = await ensureRow(name);
-        const lab_attendance = { ...(row.lab_attendance || {}), [lab]: !!body.present };
-        const patch: Row = { lab_attendance };
-        if (lab === "lab1" && body.present) patch.w2_unlocked = true; // Lab 1 attendance unlocks Weeks 2-4
-        const saved = await writeRow(name, patch);
+        const through = Number(body.through);
+        if (!Number.isInteger(through) || through < 0 || through > 8) throw new HttpError(400, "bad_week");
+        await ensureRow(name);
+        const saved = await writeRow(name, { unlock_through: through });
         return json(200, { progress: toProgress(saved) });
-      }
-
-      case "admin-set-servsafe": {
-        needAdmin();
-        const name = await target();
-        const row = await ensureRow(name);
-        const cur = row.servsafe || {};
-        const next = { ...cur };
-        const score = (v: unknown) => (v === null || v === "" ? null : Number.isFinite(Number(v)) && Number(v) >= 0 && Number(v) <= 100 ? Math.round(Number(v)) : undefined);
-        if ("practice_score" in body) { const v = score(body.practice_score); if (v === undefined) throw new HttpError(400, "bad_score"); next.practice_score = v; }
-        if ("exam_score" in body) { const v = score(body.exam_score); if (v === undefined) throw new HttpError(400, "bad_score"); next.exam_score = v; }
-        if ("exam_result" in body) {
-          if (!["pending", "passed", "failed"].includes(String(body.exam_result))) throw new HttpError(400, "bad_result");
-          next.exam_result = body.exam_result;
-        }
-        const saved = await writeRow(name, { servsafe: next, is_l2_eligible: eligible({ ...row, servsafe: next }) });
-        return json(200, { progress: toProgress(saved) });
-      }
-
-      case "admin-save-rubric": {
-        needAdmin();
-        const name = await target();
-        const lab = Number(body.lab ?? 1);
-        if (!Number.isInteger(lab) || lab < 1 || lab > 4) throw new HttpError(400, "unknown_lab");
-        const scores: Record<string, number> = {};
-        for (const [k, v] of Object.entries((body.scores || {}) as Record<string, unknown>)) {
-          if (!RUBRIC_KEYS.includes(k)) throw new HttpError(400, "unknown_criterion");
-          const n = Number(v);
-          if (!Number.isInteger(n) || n < 1 || n > 4) throw new HttpError(400, "bad_score");
-          scores[k] = n;
-        }
-        const total = Object.values(scores).reduce((a, b) => a + b, 0);
-        const complete = RUBRIC_KEYS.every((k) => k in scores);
-        const { data, error } = await sb.from("cst_rubric_scores").upsert({
-          student_name: name, lab, scores, total, band: complete ? band(total) : "Incomplete",
-          notes: typeof body.notes === "string" ? body.notes.slice(0, 2000) : null, scored_by: user, scored_at: new Date().toISOString(),
-        }, { onConflict: "student_name,lab" }).select().single();
-        if (error) throw error;
-        return json(200, { rubric: data });
       }
 
       case "admin-set-published": {
@@ -428,7 +397,7 @@ Deno.serve(async (req) => {
         const cur = await getPublished();
         const next = body.published ? Array.from(new Set([...cur, id])) : cur.filter((x) => x !== id);
         const { error } = await sb.from("lms_settings")
-          .upsert({ key: "published_quizzes", value: next, updated_at: new Date().toISOString() }, { onConflict: "key" });
+          .upsert({ key: PUBLISHED_KEY, value: next, updated_at: new Date().toISOString() }, { onConflict: "key" });
         if (error) throw error;
         return json(200, { published_quizzes: next });
       }
@@ -436,6 +405,7 @@ Deno.serve(async (req) => {
       case "admin-file-url": {
         needAdmin();
         const path = String(body.path || "");
+        if (!path.startsWith(`${LEVEL}/`)) throw new HttpError(404, "unknown_file");
         const known = await sb.from("submissions").select("file_name").eq("file_path", path).maybeSingle();
         if (!known.data) throw new HttpError(404, "unknown_file");
         const url = await sb.storage.from(BUCKET).createSignedUrl(path, 300, { download: known.data.file_name });
@@ -448,7 +418,7 @@ Deno.serve(async (req) => {
     }
   } catch (e) {
     if (e instanceof HttpError) return json(e.status, { error: e.code });
-    console.error("lms-api-v2 error", action, e);
+    console.error("cst-async-api error", action, e);
     return json(500, { error: "server_error" });
   }
 });

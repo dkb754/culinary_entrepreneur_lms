@@ -1,8 +1,8 @@
-/* Level I quiz bank — DRAFT for instructor review.
+/* Level I quiz bank — DRAFT for review.
  *
- * Written from standard food-safety, costing and culinary knowledge (FDA Food Code / ServSafe Food Handler basics).
+ * Written from standard food-safety, costing and culinary knowledge (FDA Food Code and general food handler basics).
  * NOTHING here is shown to students until you publish it: Admin → Quiz Review → Publish.
- * `todo` lines mark questions only YOU can write (your CST specifications, the 25-ingredient library, class-specific
+ * `todo` lines mark questions only YOU can write (your CST specifications, the 25-ingredient library, course-specific
  * standards). They appear in Quiz Review so nothing is invented about proprietary content.
  *
  * To edit a question: change the Q(...) line.   Q(question, correct answer, [three wrong answers], feedback shown after submit)
@@ -95,7 +95,7 @@ const QUIZ_BANK = {
     ],
   },
 
-  // ---------------- WEEK 2 · ServSafe Food Handler ----------------
+  // ---------------- WEEK 2 · Food Safety ----------------
   w2d1: {
     title: 'Quiz 5 · Foodborne Illness & Contamination', passPct: 70, todo: [],
     questions: [
@@ -225,7 +225,7 @@ const QUIZ_BANK = {
     ],
   },
 
-  // ---------------- WEEK 4 · Permits and exam prep ----------------
+  // ---------------- WEEK 4 · Permits and final review ----------------
   w4d1: {
     title: 'Quiz 13 · Permits & Licensing Intro', passPct: 70,
     todo: [],
@@ -244,7 +244,7 @@ const QUIZ_BANK = {
   },
 
   w4d2: {
-    title: 'Quiz 14 · Final Review (ServSafe Food Handler)', passPct: 70, todo: [],
+    title: 'Quiz 14 · Final Review (Food Safety)', passPct: 70, todo: [],
     questions: [
       Q('The temperature danger zone is:', '41°F to 135°F', ['0°F to 41°F', '135°F to 212°F', '70°F to 100°F'], 'Keep cold food at 41°F or below and hot food at 135°F or above.'),
       Q('The minimum internal cooking temperature for poultry is:', '165°F', ['145°F', '135°F', '155°F'], 'Poultry must reach 165°F.'),

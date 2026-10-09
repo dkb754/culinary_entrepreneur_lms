@@ -1,4 +1,4 @@
-/* Week 1 · Monday (w1d1) — Mise en Place. Reference example for the activity schema (see activities-engine.js and tools/check-activities.mjs). */
+/* Week 1 · Day 1 (w1d1) — Mise en Place. Reference example for the activity schema (see activities-engine.js and tools/check-activities.mjs). */
 ACTIVITIES.w1d1 = {
   p1: [
     {

@@ -38,25 +38,26 @@ async function setting(key: string): Promise<any> {
   return data?.value;
 }
 
-function message(first: string, survey: string) {
+function message(first: string, survey: string, selfPaced = false) {
   const reply = Deno.env.get("CHECKIN_REPLY_TO") || "duane@culinarycoach.org";
   const ask = survey
     ? `<p>Please take 3 minutes to tell us how it's going: <a href="${esc(survey)}">${esc(survey)}</a></p>`
     : `<p>Just reply to this email and tell us how it's going: are you working in food, building your business, or still planning?</p>`;
+  const when = selfPaced ? "It has been 90 days since you finished Level I of Culinary Systems Training." : "It has been 90 days since Lab 4 of Culinary Entrepreneurship I.";
   const html = `<p>Hi ${esc(first)},</p>
-<p>It has been 90 days since Lab 4 of Culinary Entrepreneurship I. We would like to hear how you are doing.</p>${ask}
+<p>${when} We would like to hear how you are doing.</p>${ask}
 <p>Open your KRP Portfolio any time to look back at your Honest Map and Professional Identity Statement.</p>
 <p>Chef Duane Brown<br>Culinary Coach</p>`;
-  const text = `Hi ${first},\n\nIt has been 90 days since Lab 4 of Culinary Entrepreneurship I. We would like to hear how you are doing.\n\n` +
+  const text = `Hi ${first},\n\n${when} We would like to hear how you are doing.\n\n` +
     (survey ? `Please take 3 minutes to tell us how it's going: ${survey}\n\n` : `Just reply to this email and tell us how it's going.\n\n`) +
     `Chef Duane Brown\nCulinary Coach\n`;
   return { html, text, reply };
 }
 
-async function sendMail(to: string, first: string, survey: string, subject = "90 days after Lab 4: how is it going?") {
+async function sendMail(to: string, first: string, survey: string, subject = "90 days after Lab 4: how is it going?", selfPaced = false) {
   const key = Deno.env.get("RESEND_API_KEY");
   if (!key) throw new Error("resend_not_configured");
-  const m = message(first, survey);
+  const m = message(first, survey, selfPaced);
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
@@ -66,6 +67,33 @@ async function sendMail(to: string, first: string, survey: string, subject = "90
     }),
   });
   if (!res.ok) throw new Error(`resend_${res.status}: ${(await res.text()).slice(0, 200)}`);
+}
+
+// Self-paced CST (level 'cst-async'): no fixed dates. A student is due 90 days after first passing Level I Quiz 14 (w4d2).
+async function runAsync(survey: string): Promise<Record<string, string>> {
+  const results: Record<string, string> = {};
+  const { data: rows, error } = await sb.from("student_progress")
+    .select("student_name,checkin_email,quizzes")
+    .eq("level", "cst-async").eq("checkin_opt_in", true).is("checkin_sent_at", null).not("checkin_email", "is", null);
+  if (error) throw error;
+  for (const r of rows || []) {
+    const at = Date.parse(r.quizzes?.w4d2?.at || "");
+    if (!r.quizzes?.w4d2?.passed || !Number.isFinite(at) || Date.now() < at + 90 * 86400000 || !EMAIL_RE.test(r.checkin_email || "")) {
+      results[r.student_name] = "not_due"; continue;
+    }
+    const claim = await sb.from("student_progress").update({ checkin_sent_at: new Date().toISOString() })
+      .eq("student_name", r.student_name).is("checkin_sent_at", null).select("student_name");
+    if (claim.error || !claim.data?.length) { results[r.student_name] = "already_claimed"; continue; }
+    try {
+      await sendMail(r.checkin_email, r.student_name.split(" ")[0], survey, "90 days after Level I: how is it going?", true);
+      results[r.student_name] = "sent";
+    } catch (e) {
+      await sb.from("student_progress").update({ checkin_sent_at: null }).eq("student_name", r.student_name);
+      console.error("async check-in send failed", r.student_name, String(e));
+      results[r.student_name] = "failed";
+    }
+  }
+  return results;
 }
 
 Deno.serve(async (req) => {
@@ -99,8 +127,9 @@ Deno.serve(async (req) => {
     if (!isCron) return json(400, { error: "nothing_to_do" });
 
     // ---- scheduled run
-    if (Date.now() < SEND_ON) return json(200, { due: false, send_on: new Date(SEND_ON).toISOString().slice(0, 10) });
     if (!Deno.env.get("RESEND_API_KEY")) return json(503, { error: "resend_not_configured" });
+    const asyncResults = await runAsync(survey);   // self-paced CST: 90 days after each student passes the Level I final quiz
+    if (Date.now() < SEND_ON) return json(200, { due: false, send_on: new Date(SEND_ON).toISOString().slice(0, 10), async: asyncResults });
 
     const { data: rows, error } = await sb.from("student_progress")
       .select("student_name,checkin_email,lab_attendance")
@@ -121,7 +150,7 @@ Deno.serve(async (req) => {
         results[r.student_name] = "failed";
       }
     }
-    return json(200, { due: true, results });
+    return json(200, { due: true, results, async: asyncResults });
   } catch (e) {
     if (String(e).includes("resend_not_configured")) return json(503, { error: "resend_not_configured" });
     console.error("send-checkins error", e);

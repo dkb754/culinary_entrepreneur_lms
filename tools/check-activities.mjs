@@ -5,9 +5,13 @@ import path from 'node:path';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const rd = f => readFileSync(path.join(ROOT, 'content', f), 'utf8');
 const files = readdirSync(path.join(ROOT, 'content')).filter(f => /^activities-w.*\.js$/.test(f)).sort();
-const code = rd('level1.js') + rd('level1-lessons.js') + rd('activities-engine.js') + rd('level1-diagrams.js') + files.map(rd).join('\n') +
-  '\nreturn { LEVEL1, ACTIVITIES, DIAGRAMS, actDefs };';
-const { LEVEL1, ACTIVITIES, DIAGRAMS } = new Function(code)();
+const all = readdirSync(path.join(ROOT, 'content'));
+const glob = re => all.filter(f => re.test(f)).sort();
+const lessonFiles = ['level1-lessons.js', ...glob(/^cst-l2-lessons-w\d\.js$/)];
+const quizFiles = ['level1-quizzes.js', ...glob(/^cst-l2-quizzes-w\d\.js$/)];
+const code = rd('level1.js') + rd('cst-level2.js') + lessonFiles.map(rd).join('\n') + rd('cst-attach.js') + rd('activities-engine.js') + rd('level1-diagrams.js') + files.map(rd).join('\n') + quizFiles.map(rd).join('\n') +
+  '\nreturn { LEVEL1, ACTIVITIES, DIAGRAMS, actDefs, QUIZ_BANK };';
+const { LEVEL1, ACTIVITIES, DIAGRAMS, QUIZ_BANK } = new Function(code)();
 const errs = []; const bad = (m) => errs.push(m);
 const KEYS = ['intro', 'p1', 'p2', 'p3', 'p4', 'end'];
 const wc = s => (String(s).match(/\S+/g) || []).length;
@@ -15,7 +19,7 @@ const dayById = Object.fromEntries(LEVEL1.days.map(d => [d.id, d]));
 let counts = { choice: 0, order: 0, match: 0, fill: 0, reflect: 0, diagram: 0 };
 for (const [day, parts] of Object.entries(ACTIVITIES)) {
   const d = dayById[day]; if (!d) { bad(`${day}: unknown day`); continue; }
-  const partsInLesson = [...d.lesson.matchAll(/<h4>PART (\d+)/g)].map(m => 'p' + m[1]);
+  const partsInLesson = [...(d.lesson||"").matchAll(/<h4>PART (\d+)/g)].map(m => 'p' + m[1]);
   for (const [key, list] of Object.entries(parts)) {
     if (!KEYS.includes(key)) bad(`${day}.${key}: bad part key`);
     if (/^p\d$/.test(key) && !partsInLesson.includes(key)) bad(`${day}.${key}: lesson has no ${key.toUpperCase().replace('P', 'PART ')}`);
@@ -61,9 +65,22 @@ for (const [day, parts] of Object.entries(ACTIVITIES)) {
 for (const d of LEVEL1.days) {
   const parts = ACTIVITIES[d.id] || {};
   const graded = k => (parts[k] || []).filter(a => a.type !== 'diagram').length;
-  const pl = [...d.lesson.matchAll(/<h4>PART (\d+)/g)].map(m => 'p' + m[1]);
+  const pl = [...(d.lesson||"").matchAll(/<h4>PART (\d+)/g)].map(m => 'p' + m[1]);
   if (pl.length) pl.forEach(k => { if (!graded(k)) bad(`${d.id}: ${k.toUpperCase().replace('P', 'PART ')} has no graded activity`); });
   else if (!graded('end') && !graded('intro')) bad(`${d.id}: no graded activity (use "end")`);
+}
+// every day has a lesson with PART headings (or at least some text) and a well-formed quiz where one is declared
+for (const d of LEVEL1.days) {
+  if (!d.lesson || d.lesson.length < 400) bad(`${d.id}: lesson text missing or too short`);
+  if (d.quiz) {
+    const q = QUIZ_BANK[d.quiz];
+    if (!q) { bad(`${d.id}: quiz ${d.quiz} is missing from the quiz bank`); continue; }
+    if (!q.title || q.passPct !== 70) bad(`${d.quiz}: title / passPct 70`);
+    if (!q.questions || q.questions.length < 10) bad(`${d.quiz}: needs at least 10 questions`);
+    (q.questions || []).forEach((x, i) => {
+      if (!x.q || !x.feedback || !x.opts || x.opts.length !== 4 || new Set(x.opts).size !== 4 || !(x.ans >= 0 && x.ans < 4)) bad(`${d.quiz} Q${i + 1}: question, feedback, 4 distinct options and a valid answer`);
+    });
+  }
 }
 const n = Object.values(counts).reduce((a, b) => a + b, 0);
 console.log(`${files.length} files · ${Object.keys(ACTIVITIES).length} days · ${n} activities ${JSON.stringify(counts)}`);

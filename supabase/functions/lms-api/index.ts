@@ -130,6 +130,7 @@ Deno.serve(async (req) => {
     const { data: sess, error: sErr } = await sb.rpc("lms_session", { p_token: token });
     if (sErr) throw sErr;
     if (!sess) return json(401, { error: "session_expired" });
+    if (sess.level === "cst-async") return json(403, { error: "wrong_product" });
     const user: string = sess.student_name;
     const isAdmin: boolean = !!sess.is_admin;
     const needStudent = () => { if (isAdmin) throw new HttpError(403, "admin_preview"); };

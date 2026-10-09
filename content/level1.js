@@ -1,47 +1,32 @@
-/* Culinary Entrepreneurship I — Level I curriculum (Oct 12 – Nov 7, 2026)
- * Source: "Level I Curriculum Map & Dual-Level Platform Architecture" brief. This file is DATA ONLY: edit text here,
- * not in index.html. Real calendar weekdays are used (the brief's Week 3 Saturday and Week 4 dates were each a day off).
+/* Culinary Systems Training — Self-Paced (cst-async). Level I (weeks 1–4) + Level II (weeks 5–8). DATA ONLY.
+ * No dates, no labs: progress-based. Level II days/weeks are appended by content/cst-level2.js.
  *
- *   id        w{week}d{day} for Mon–Thu modules, w{week}lab for Saturday labs. The server (lms-api-v2) knows the same ids.
- *   topics    the brief's "Online content" column — an OUTLINE. Add the full lesson text in `lesson` (HTML string) when ready.
- *   quiz      id of the quiz in QUIZ_BANK (level1-quizzes.js), or null
+ *   id        w{week}d{day}; weeks 1–4 are Level I, weeks 5–8 are Level II (week 5 = "Level II · Week 1").
+ *   topics    short outline shown above the lesson text
+ *   quiz      id of the quiz in QUIZ_BANK (level1-quizzes.js / cst-l2-quizzes-*.js), or null
  *   file      a student upload: { label, blurb, due }  (server: FILE_ASSIGNMENTS)
  *   resources outside links shown on the day (verified by CI: tools/check-links.py)
  */
 const YT = id => 'https://www.youtube.com/watch?v=' + id;
 
 const LEVEL1 = {
-  title: 'Culinary Entrepreneurship I',
-  cohort: 'Level I · Fall 2026',
-  dates: 'Oct 12 – Nov 7, 2026',
+  title: 'Culinary Systems Training — Self-Paced',
+  levels: [
+    { id: 'L1', name: 'Level I', title: 'Level I · CST Module 1', weeks: [1, 2, 3, 4] },
+    { id: 'L2', name: 'Level II', title: 'Level II · Business Planning', weeks: [5, 6, 7, 8] },
+  ],
   weeks: [
-    {
-      n: 1, title: 'Kitchen Readiness & Systems', side: 'Kitchen Readiness & Systems',
-      sub: 'CST Module 1 + Food Safety Foundation', dates: 'Oct 12–18', long: 'October 12–18, 2026',
-      note: 'Mon–Thu online (about 3 hours a day) · Saturday Lab 1 in person · Lab 1 attendance unlocks Weeks 2–4',
-    },
-    {
-      n: 2, title: 'Food Safety & ServSafe Food Handler', side: 'Food Safety & ServSafe',
-      sub: 'ServSafe Food Handler preparation', dates: 'Oct 19–25', long: 'October 19–25, 2026',
-      note: 'Mon–Thu online · Saturday Lab 2: ServSafe practice exam + kitchen safety',
-    },
-    {
-      n: 3, title: 'Costing, Pricing, Menu & Business Formats', side: 'Costing, Menu & Formats',
-      sub: 'The numbers and the shape of a food business', dates: 'Oct 26 – Nov 1', long: 'October 26 – November 1, 2026',
-      note: 'Mon–Thu online · Saturday Lab 3: production and costing in action (Oct 31)',
-    },
-    {
-      n: 4, title: 'Permits, Licensing & Capstone', side: 'Permits & Capstone',
-      sub: 'Licensing, exam prep and your Concept Brief', dates: 'Nov 2–7', long: 'November 2–7, 2026',
-      note: 'Mon–Thu online · Saturday Lab 4: ServSafe exam, Concept Brief presentations, certificates (Nov 7)',
-    },
+    { n: 1, title: 'Kitchen Readiness & Systems', side: 'Kitchen Readiness & Systems', sub: 'Mise en place, knife skills, recipes, storage and kitchen communication', note: 'About 3 hours a day, 4 days. Pass every Week 1 quiz (70%+) to unlock Week 2.' },
+    { n: 2, title: 'Food Safety', side: 'Food Safety', sub: 'Foodborne illness, hygiene, time and temperature, cleaning and sanitizing', note: 'About 3 hours a day, 4 days. Pass every Week 2 quiz to unlock Week 3.' },
+    { n: 3, title: 'Costing, Pricing, Menu & Business Formats', side: 'Costing, Menu & Formats', sub: 'The numbers and the shape of a food business', note: 'About 3 hours a day, 4 days. Pass every Week 3 quiz to unlock Week 4.' },
+    { n: 4, title: 'Permits, Food Safety Review & Capstone', side: 'Permits & Capstone', sub: 'Licensing, a final review and your Concept Brief', note: 'Finish Level I: pass both quizzes and submit your Concept Brief to unlock Level II.' },
   ],
 
   days: [
     // ---------------- WEEK 1 ----------------
     {
-      id: 'w1d1', week: 1, dow: 'Monday', date: 'October 12', short: 'Oct 12', module: 'CST M1: Mise en Place',
-      layer: 'KRP Phase 1 · Week 1 — Honest Map', hours: '~3 hours',
+      id: 'w1d1', week: 1, module: 'CST M1: Mise en Place',
+      layer: 'KRP Phase 1 — Honest Map', hours: '~3 hours',
       topics: ['What mise en place means', 'Workstation anatomy', 'The CST philosophy', 'Professional mindset'],
       resources: [
         { t: 'video', title: 'What Is Mise en Place and Why It Matters', meta: 'YouTube', url: YT('Hf4okUst6Cw') },
@@ -49,7 +34,7 @@ const LEVEL1 = {
       quiz: 'w1d1',
     },
     {
-      id: 'w1d2', week: 1, dow: 'Tuesday', date: 'October 13', short: 'Oct 13', module: 'CST M1: Knife Skills & Ingredients',
+      id: 'w1d2', week: 1, module: 'CST M1: Knife Skills & Ingredients',
       layer: 'KRP — see the job as it really is', hours: '~3 hours',
       topics: ['Knife safety and grip', 'Classic cuts: large, medium and small dice, julienne, chiffonade', 'The 25-ingredient library'],
       resources: [
@@ -59,7 +44,7 @@ const LEVEL1 = {
       quiz: 'w1d2',
     },
     {
-      id: 'w1d3', week: 1, dow: 'Wednesday', date: 'October 14', short: 'Oct 14', module: 'CST M1: Recipe Execution & Storage',
+      id: 'w1d3', week: 1, module: 'CST M1: Recipe Execution & Storage',
       layer: 'KRP — keep your head clear', hours: '~3 hours',
       topics: ['Standardized recipe format', 'Unit conversion and yield', 'FIFO, labeling and temperature control', 'Cross-contamination'],
       resources: [
@@ -69,7 +54,7 @@ const LEVEL1 = {
       quiz: 'w1d3',
     },
     {
-      id: 'w1d4', week: 1, dow: 'Thursday', date: 'October 15', short: 'Oct 15', module: 'CST M1: Production & Team Communication',
+      id: 'w1d4', week: 1, module: 'CST M1: Production & Team Communication',
       layer: 'KRP — who you are at work', hours: '~3 hours',
       topics: ['Prep lists', 'Production timelines', 'Kitchen calls and acknowledgments', 'Line communication standards'],
       resources: [
@@ -78,22 +63,15 @@ const LEVEL1 = {
       ],
       quiz: 'w1d4',
       file: {
-        label: 'Honest Map', due: 'Thursday, Oct 15', krp: 'KRP Deliverable 1',
-        blurb: 'Your Honest Map: an accurate picture of what working in food really involves and where you stand today. Build it in Monday’s lesson (Part 3: The Honest Map), download your file there, improve it, and upload it here.',
+        label: 'Honest Map', due: 'End of Week 1', krp: 'KRP Deliverable 1',
+        blurb: 'Your Honest Map: an accurate picture of what working in food really involves and where you stand today. Build it in the Day 1 lesson (Part 3: The Honest Map), download your file there, improve it, and upload it here.',
       },
-    },
-    {
-      id: 'w1lab', lab: 'lab1', week: 1, dow: 'Saturday', date: 'October 17', short: 'Oct 17', module: 'LAB 1 — CST Assessment',
-      layer: 'KRP — feel the real kitchen',
-      activities: ['Mise en place setup', 'Knife cuts assessed against the rubric', 'Storage and labeling check', 'Prep list execution', 'Team debrief'],
-      assessment: 'CST Rubric (100 points): Arrival/Setup, Knife Skills, Storage, Production',
-      unlocks: 'Your instructor confirms your attendance at the lab. That unlocks Weeks 2–4.',
     },
 
     // ---------------- WEEK 2 ----------------
     {
-      id: 'w2d1', week: 2, dow: 'Monday', date: 'October 19', short: 'Oct 19', module: 'ServSafe: Foodborne Illness & Contamination',
-      layer: 'KRP Phase 2 · Week 2 — Know Your Warning Signs', hours: '~3 hours',
+      id: 'w2d1', week: 2, module: 'Food Safety: Foodborne Illness & Contamination',
+      layer: 'KRP Phase 2 — Know Your Warning Signs', hours: '~3 hours',
       topics: ['Causes of foodborne illness', 'FAT TOM', 'Biological, chemical and physical hazards', 'High-risk populations'],
       resources: [
         { t: 'video', title: 'What Is FAT TOM?', meta: 'YouTube', url: YT('fdLeMQ0HqbM') },
@@ -102,7 +80,7 @@ const LEVEL1 = {
       quiz: 'w2d1',
     },
     {
-      id: 'w2d2', week: 2, dow: 'Tuesday', date: 'October 20', short: 'Oct 20', module: 'ServSafe: Personal Hygiene & Handwashing',
+      id: 'w2d2', week: 2, module: 'Food Safety: Personal Hygiene & Handwashing',
       layer: '', hours: '~3 hours',
       topics: ['Handwashing steps and when to wash', 'Gloves', 'Illness reporting', 'Bare-hand contact policy'],
       resources: [
@@ -112,7 +90,7 @@ const LEVEL1 = {
       quiz: 'w2d2',
     },
     {
-      id: 'w2d3', week: 2, dow: 'Wednesday', date: 'October 21', short: 'Oct 21', module: 'ServSafe: Time-Temperature Control & Receiving',
+      id: 'w2d3', week: 2, module: 'Food Safety: Time-Temperature Control & Receiving',
       layer: '', hours: '~3 hours',
       topics: ['The danger zone (41–135°F)', 'Safe cooking temperatures', 'Cooling and reheating', 'Receiving inspections and rejection criteria'],
       resources: [
@@ -121,12 +99,12 @@ const LEVEL1 = {
       ],
       quiz: 'w2d3',
       file: {
-        label: 'Professional Identity Statement', due: 'Wednesday, Oct 21', krp: 'KRP Deliverable 2',
-        blurb: 'Your Professional Identity Statement: who you are as a food professional and what you are building toward. Follow the template your instructor gives you.',
+        label: 'Professional Identity Statement', due: 'End of Week 2', krp: 'KRP Deliverable 2',
+        blurb: 'Your Professional Identity Statement: who you are as a food professional and what you are building toward. Use the prompts in the lessons to shape it.',
       },
     },
     {
-      id: 'w2d4', week: 2, dow: 'Thursday', date: 'October 22', short: 'Oct 22', module: 'ServSafe: Cleaning, Sanitizing & Facilities',
+      id: 'w2d4', week: 2, module: 'Food Safety: Cleaning, Sanitizing & Facilities',
       layer: '', hours: '~3 hours',
       topics: ['Cleaning vs sanitizing', 'Chemical concentrations', 'Cloth storage and dishwashing', 'Pest prevention', 'Facilities requirements'],
       resources: [
@@ -135,17 +113,11 @@ const LEVEL1 = {
       ],
       quiz: 'w2d4',
     },
-    {
-      id: 'w2lab', lab: 'lab2', week: 2, dow: 'Saturday', date: 'October 24', short: 'Oct 24', module: 'LAB 2 — ServSafe Practice + Kitchen Safety',
-      layer: '',
-      activities: ['ServSafe practice exam (proctored, on the ServSafe platform)', 'Temperature checks', 'Sanitation stations', 'Debrief'],
-      assessment: 'Practice exam score reviewed · ServSafe account confirmed active',
-    },
 
     // ---------------- WEEK 3 ----------------
     {
-      id: 'w3d1', week: 3, dow: 'Monday', date: 'October 26', short: 'Oct 26', module: 'Costing & Pricing Basics',
-      layer: 'KRP Phase 2 · Week 3 — Change How You See Pressure', hours: '~3 hours',
+      id: 'w3d1', week: 3, module: 'Costing & Pricing Basics',
+      layer: 'KRP Phase 2 — Change How You See Pressure', hours: '~3 hours',
       topics: ['Food cost percentage', 'Recipe costing', 'EP vs AP', 'Plate cost', 'Pricing for profit', 'Break-even intro'],
       resources: [
         { t: 'read', title: 'Calculating Food Cost Percentage', meta: 'RestaurantOwner.com', url: 'https://www.restaurantowner.com/public/4753.cfm' },
@@ -155,7 +127,7 @@ const LEVEL1 = {
       quiz: 'w3d1',
     },
     {
-      id: 'w3d2', week: 3, dow: 'Tuesday', date: 'October 27', short: 'Oct 27', module: 'Menu Fundamentals',
+      id: 'w3d2', week: 3, module: 'Menu Fundamentals',
       layer: '', hours: '~3 hours',
       topics: ['Menu engineering basics', 'Consistency and production capacity', 'Pricing strategy', 'What sells vs what costs'],
       resources: [
@@ -164,7 +136,7 @@ const LEVEL1 = {
       quiz: 'w3d2',
     },
     {
-      id: 'w3d3', week: 3, dow: 'Wednesday', date: 'October 28', short: 'Oct 28', module: 'Food Business Formats',
+      id: 'w3d3', week: 3, module: 'Food Business Formats',
       layer: 'KRP — Build Your People', hours: '~3 hours',
       topics: ['Booth, pop-up, cottage food, catering and food truck: what each one takes', 'Pros and cons', 'Capital requirements'],
       resources: [
@@ -176,7 +148,7 @@ const LEVEL1 = {
       quiz: 'w3d3',
     },
     {
-      id: 'w3d4', week: 3, dow: 'Thursday', date: 'October 29', short: 'Oct 29', module: 'Sourcing, Vendors & Customers',
+      id: 'w3d4', week: 3, module: 'Sourcing, Vendors & Customers',
       layer: '', hours: '~3 hours',
       topics: ['Where product comes from', 'Supplier relationships', 'Cost negotiation basics', 'Customer identification', 'Reading demand'],
       resources: [
@@ -187,25 +159,15 @@ const LEVEL1 = {
       ],
       quiz: 'w3d4',
       file: {
-        label: 'Recipe Cost Sheet', due: 'Thursday, Oct 29',
+        label: 'Recipe Cost Sheet', due: 'End of Week 3',
         blurb: 'Cost one of your recipes. Use the food-cost formula from this week: (Cost of Ingredients ÷ Sale Price) × 100.',
-      },
-    },
-    {
-      id: 'w3lab', lab: 'lab3', week: 3, dow: 'Saturday', date: 'October 31', short: 'Oct 31', module: 'LAB 3 — Production & Costing in Action',
-      layer: '',
-      activities: ['Execute a recipe from a standardized card', 'Cost your production', 'Plate and present', 'Peer critique'],
-      assessment: 'Production rubric · costed recipe card submitted',
-      file: {
-        label: 'Costed Recipe Card', due: 'After Lab 3',
-        blurb: 'Upload the costed recipe card from your Lab 3 production.',
       },
     },
 
     // ---------------- WEEK 4 ----------------
     {
-      id: 'w4d1', week: 4, dow: 'Monday', date: 'November 2', short: 'Nov 2', module: 'Permits & Licensing — Intro',
-      layer: 'KRP Phase 2 · Week 4 — Recharge So You Can Keep Going', hours: '~3 hours',
+      id: 'w4d1', week: 4, module: 'Permits & Licensing — Intro',
+      layer: 'KRP Phase 2 — Recharge So You Can Keep Going', hours: '~3 hours',
       topics: ['Virginia food handler permit', 'Home-based and cottage food law', 'Health department inspection basics', 'VDACS requirements'],
       resources: [
         { t: 'read', title: 'Applying for a Food Permit (Virginia Department of Health)', meta: 'VDH', url: 'https://www.vdh.virginia.gov/environmental-health/food-safety-in-virginia/foodapplication/' },
@@ -215,79 +177,56 @@ const LEVEL1 = {
       quiz: 'w4d1',
     },
     {
-      id: 'w4d2', week: 4, dow: 'Tuesday', date: 'November 3', short: 'Nov 3', module: 'ServSafe Food Handler Exam Prep',
+      id: 'w4d2', week: 4, module: 'Food Safety Final Review',
       layer: '', hours: '~3 hours',
-      topics: ['Full practice exam review', 'Domain focus: contamination, temperatures, hygiene, facilities', 'Test-taking strategy'],
+      topics: ['Review of the food safety domains', 'Temperature control, hygiene, cleaning and facilities', 'A study plan for the final quiz'],
       resources: [
-        { t: 'video', title: 'ServSafe Food Handler Practice Test', meta: 'YouTube', url: YT('-6TvLFNQyZw') },
-        { t: 'link', title: 'ServSafe Food Handler: Get Certified', meta: 'ServSafe.com', url: 'https://www.servsafe.com/ServSafe-Food-Handler/Get-Certified' },
+        { t: 'video', title: 'Food Handler Practice Questions', meta: 'YouTube', url: YT('-6TvLFNQyZw') },
       ],
       quiz: 'w4d2',
     },
     {
-      id: 'w4d3', week: 4, dow: 'Wednesday', date: 'November 4', short: 'Nov 4', module: 'Capstone Prep — Concept Brief',
+      id: 'w4d3', week: 4, module: 'Capstone — Your Concept Brief',
       layer: 'KRP — KRP Portfolio Review', hours: '~3 hours',
       topics: ['Concept Brief template walkthrough', 'Business name, product or service, format, customer, pricing and next step'],
       resources: [],
-      quiz: null, assessment: 'Instructor review and feedback',
+      quiz: null,
       file: {
-        label: 'Concept Brief Draft', due: 'Wednesday, Nov 4',
-        blurb: 'A draft of your Concept Brief: business name, product or service, format, customer, pricing and your next step.',
+        label: 'Concept Brief', due: 'End of Week 4', krp: 'Level I capstone',
+        blurb: 'Your Concept Brief: business name, product or service, format, customer, pricing and your next step. Build it in the Capstone lesson, download it, improve it, and upload it here. Submitting it (with every Level I quiz passed) unlocks Level II.',
       },
     },
     {
-      id: 'w4d4', week: 4, dow: 'Thursday', date: 'November 5', short: 'Nov 5', module: 'KRP Portfolio & 90-Day Plan',
+      id: 'w4d4', week: 4, module: 'KRP Portfolio & 90-Day Plan',
       layer: 'KRP Phase 3 — Post-Placement Prep', hours: '~3 hours',
       topics: ['What the first 30–90 days actually look like', 'KRP toolkit review', '90-day check-in intro'],
       resources: [],
       quiz: null,
       file: {
-        label: 'KRP Portfolio', due: 'Thursday, Nov 5', krp: 'Complete portfolio',
-        blurb: 'Your complete KRP Portfolio: every KRP deliverable together (Honest Map, Professional Identity Statement and your finished work).',
-      },
-    },
-    {
-      id: 'w4lab', lab: 'lab4', week: 4, dow: 'Saturday', date: 'November 7', short: 'Nov 7', module: 'LAB 4 — ServSafe Exam + Capstone Presentations',
-      layer: '',
-      activities: ['ServSafe Food Handler exam (proctored)', 'Concept Brief presented to the cohort and instructor', 'Certificate ceremony'],
-      assessment: 'ServSafe result · Concept Brief rubric',
-      file: {
-        label: 'Concept Brief', due: 'Lab 4',
-        blurb: 'Upload the final Concept Brief you present at Lab 4.',
+        label: 'KRP Portfolio', due: 'End of Week 4', krp: 'Complete portfolio',
+        blurb: 'Your complete KRP Portfolio: every KRP deliverable together (Honest Map, Professional Identity Statement and your reflections on the four KRP skills).',
       },
     },
   ],
 
-  // KRP skill clusters (Phase 2) — embedded in the weekly modules and labs
+  // KRP skill clusters (Phase 2) — embedded in the weekly modules
   krp: {
     // The four Phase 2 skills, in plain language (student-facing)
     skills: [
-      { name: 'Know Your Warning Signs', when: 'Mon, Oct 19', day: 'w2d1', desc: 'Learn to spot when stress is building before it takes you out. You’ll identify your own signals — physical, mental, and emotional — so you can catch problems early.' },
-      { name: 'Change How You See Pressure', when: 'Mon, Oct 26', day: 'w3d1', desc: 'Hard moments in the kitchen are part of the job, not a sign you don’t belong. This skill teaches you to reframe high-pressure situations as performance conditions you can handle.' },
-      { name: 'Build Your People', when: 'Wed, Oct 28', day: 'w3d3', desc: 'No successful food business runs alone. You’ll identify the people in your corner — mentors, peers, customers — and learn how to lean on that network when things get tough.' },
-      { name: 'Recharge So You Can Keep Going', when: 'Mon, Nov 2', day: 'w4d1', desc: 'Burnout is real in this industry. This skill is about knowing how to recover between shifts and seasons so you stay in the game long-term.' },
+      { name: 'Know Your Warning Signs', when: 'Level I · Week 2', day: 'w2d1', desc: 'Learn to spot when stress is building before it takes you out. You’ll identify your own signals — physical, mental, and emotional — so you can catch problems early.' },
+      { name: 'Change How You See Pressure', when: 'Level I · Week 3', day: 'w3d1', desc: 'Hard moments in the kitchen are part of the job, not a sign you don’t belong. This skill teaches you to reframe high-pressure situations as performance conditions you can handle.' },
+      { name: 'Build Your People', when: 'Level I · Week 3', day: 'w3d3', desc: 'No successful food business runs alone. You’ll identify the people in your corner — mentors, peers, customers — and learn how to lean on that network when things get tough.' },
+      { name: 'Recharge So You Can Keep Going', when: 'Level I · Week 4', day: 'w4d1', desc: 'Burnout is real in this industry. This skill is about knowing how to recover between shifts and seasons so you stay in the game long-term.' },
     ],
     phases: [
-      { n: 1, name: 'Conceptualization', weeks: 'Weeks 1–2', focus: 'Build accurate expectations and a professional identity.', out: 'Honest Map (Week 1) · Professional Identity Statement (Week 2)' },
-      { n: 2, name: 'Skill Acquisition', weeks: 'Weeks 3–4', focus: 'Four skills for handling pressure, taught alongside your kitchen training.', out: 'Know Your Warning Signs (Oct 19) · Change How You See Pressure (Oct 26) · Build Your People (Oct 28) · Recharge So You Can Keep Going (Nov 2)' },
-      { n: 3, name: 'Application', weeks: 'Week 4 + after the course', focus: 'Your 90-day plan and first-shift preparation.', out: 'KRP Portfolio · a 90-day check-in email after Lab 4' },
+      { n: 1, name: 'Conceptualization', weeks: 'Level I · Weeks 1–2', focus: 'Build accurate expectations and a professional identity.', out: 'Honest Map (Week 1) · Professional Identity Statement (Week 2)' },
+      { n: 2, name: 'Skill Acquisition', weeks: 'Level I · Weeks 3–4', focus: 'Four skills for handling pressure, taught alongside your food training.', out: 'Know Your Warning Signs (Week 2) · Change How You See Pressure (Week 3) · Build Your People (Week 3) · Recharge So You Can Keep Going (Week 4)' },
+      { n: 3, name: 'Application', weeks: 'Level I · Week 4 and after', focus: 'Your 90-day plan and first-shift preparation.', out: 'KRP Portfolio · a 90-day check-in email after you pass the Level I final quiz' },
     ],
     items: [
-      { key: 'honest_map', label: 'Honest Map', day: 'w1d4', due: 'Oct 15' },
-      { key: 'identity_statement', label: 'Professional Identity Statement', day: 'w2d3', due: 'Oct 21' },
-      { key: 'portfolio', label: 'KRP Portfolio', day: 'w4d4', due: 'Nov 5' },
+      { key: 'honest_map', label: 'Honest Map', day: 'w1d4', due: 'End of Week 1' },
+      { key: 'identity_statement', label: 'Professional Identity Statement', day: 'w2d3', due: 'End of Week 2' },
+      { key: 'portfolio', label: 'KRP Portfolio', day: 'w4d4', due: 'End of Week 4' },
     ],
   },
-};
-
-// CST Module 1 rubric — 25 criteria x 4 points = 100. Scored 4 / 3 / 2 / 1. 80+ Pass · 70–79 Conditional · below 70 Remediation.
-// Section 4 lists six criteria: three are named in the brief, three are proposed (edit the names here; the keys stay).
-const CST_RUBRIC = {
-  sections: [
-    { id: 's1', title: 'Arrival, Uniform & Station Setup', note: 'Scored 4/3/2/1', criteria: ['Uniform', 'Knife roll', 'Workstation', 'Organization', 'Self-start'] },
-    { id: 's2', title: 'Knife Skills & Cut Execution', note: 'Cuts measured against spec dimensions', criteria: ['Grip', 'Guide hand', 'Large dice', 'Medium dice', 'Small dice', 'Julienne', 'Chiffonade', 'Speed'] },
-    { id: 's3', title: 'Food Storage, Labeling & Safety', note: 'Zero tolerance on cross-contamination', criteria: ['Labeling', 'Temperature', 'FIFO', 'Color-coded boards', 'Handwashing', 'Portioning'] },
-    { id: 's4', title: 'Production & Communication', note: 'Line communication assessed in real time', criteria: ['Recipe execution', 'Prep list completion', 'Team calls and acknowledgments', 'Timeline management', 'Station cleanliness during production', 'Plating and presentation'] },
-  ],
-  band: total => (total >= 80 ? 'Pass' : total >= 70 ? 'Conditional' : 'Remediation required'),
 };

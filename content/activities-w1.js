@@ -1,4 +1,4 @@
-/* Week 1 · Tuesday–Saturday (w1d2, w1d3, w1d4, w1lab). Schema reference: activities-w1d1.js and tools/check-activities.mjs. */
+/* Week 1 · Days 2–4 (w1d2, w1d3, w1d4). Schema reference: activities-w1d1.js and tools/check-activities.mjs. */
 ACTIVITIES.w1d2 = {
   p1: [
     {
@@ -211,81 +211,37 @@ ACTIVITIES.w1d4 = {
   ],
   p3: [
     {
-      type: 'order', title: 'Get ready for Saturday: a readiness plan',
-      intro: 'Put these steps in the most sensible order, first step at the top.',
-      steps: ['Read the full lab prep list: every item, quantity and cut specification', 'Mark the time-critical tasks and decide what must be done first', 'Look up any ingredient you do not know', 'Check that your knife roll is complete and your knives are sharp', 'Lay out your full uniform and tools the night before', 'Arrive by 10:00 AM in full uniform'],
-      why: 'Review the whole plan, decide the order of work, and research gaps while there is time. Then check your tools and uniform and arrive ready. Doing it in this order means no surprises on the day.',
+      type: 'order', title: 'A home practice session, start to finish',
+      intro: 'Put these steps in the most sensible order for one knife skills practice session, first step at the top.',
+      steps: ['Read the cut sizes and the checklist, and pick two or three cuts to practice', 'Wash your hands, clear a counter and set up a clean, steady cutting board', 'Check your knife and lay out your tools and containers (mise en place)', 'Cut slowly with the pinch grip and curled guide hand, measuring the first few pieces', 'Compare your pieces with the checklist and note what to fix', 'Label and store the food, then wipe and sanitize your station'],
+      why: 'Plan first, set up your station, then cut slowly and measure. Check your work against the checklist while the pieces are in front of you. Finish by storing the food safely and cleaning up, just like in a real kitchen.',
     },
     {
-      type: 'choice', title: 'Readiness check',
+      type: 'choice', title: 'Practice check',
       items: [
-        { q: 'The lab prep list says "chiffonade 1 bunch basil" and you have never done it. What is the best use of the days before the lab?', opts: ['Practice the cut at home and review how to stack, roll and slice', 'Plan to watch others on the day', 'Skip it and let a classmate do it', 'Hope the instructor changes the list'], ans: 0, why: 'The briefing is the only window to ask questions, so arrive knowing the cut. Practice makes you faster and safer.' },
-        { q: 'You open your knife roll the night before and find the honing steel missing. What do you do?', opts: ['Replace it before Saturday so the roll is complete', 'Go without it', 'Borrow one at the lab', 'Take a different tool'], ans: 0, why: 'The minimum roll is a chef’s knife, paring knife, bench scraper, peeler and honing steel. A deficiency is documented on the rubric at arrival.' },
-        { q: 'You are unsure of the exact weight to cut for one item on the lab prep list. When is the best time to ask?', opts: ['Before you arrive if possible, or during the pre-shift briefing', 'After you have started cutting', 'During the quality check', 'Never, because asking looks weak'], ans: 0, why: 'The pre-shift briefing is the only window for questions. Reviewing in advance means your questions are specific and short.' },
+        { q: 'You have never done a chiffonade. What is the best way to practice at home?', opts: ['Stack the leaves, roll them tightly, and slice thin ribbons slowly, then check the ribbons against the checklist', 'Skip it, since it is only a garnish', 'Chop the leaves as fast as you can', 'Wait until you have a job to try it'], ans: 0, why: 'Slow, correct practice builds good habits. Speed comes later, after the technique is right.' },
+        { q: 'You do not own a honing steel yet. What is the best plan?', opts: ['Add it to your tool list and start with the tools you have, working carefully and keeping the knife safe', 'Practice anyway with a dull knife and push harder', 'Stop practicing until you buy a full set', 'Borrow a knife and cut without looking'], ans: 0, why: 'You can practice with a basic sharp knife and a stable board. Make a short list of tools to add over time. A dull knife is more dangerous, not less.' },
+        { q: 'Your julienne carrots are different lengths. What is the best response?', opts: ['Note it on your checklist, trim the carrots to one length first, and try again', 'Decide the checklist is too strict', 'Throw the carrots away and quit for the day', 'Do not look at the checklist'], ans: 0, why: 'Self-checking only works if you are honest. Write down what to fix and try again.' },
+        { q: 'You finish practicing and have a bowl of cut vegetables you plan to use tomorrow. What do you do?', opts: ['Label it with the item, prep date and use-by date, and refrigerate it at 41°F or below', 'Leave it on the counter', 'Cover it and leave it by the stove', 'Mix it with other vegetables'], ans: 0, why: 'Home practice should follow the same storage rules as a kitchen: label it and keep it cold.' },
       ],
     },
     {
-      type: 'reflect', title: 'Your pre-lab plan',
-      intro: 'Review the Saturday lab plan, then write your own plan in your own words.',
+      type: 'reflect', title: 'Your home practice plan',
+      intro: 'Write your own plan for practicing the skills from this week. Use your own words and be specific.',
       prompts: [
-        { key: 'critical', label: 'Which tasks on the prep list are time-critical, and why do they go first?', help: 'Name at least two tasks and the reason for the order.', items: 1, minWords: 20, rows: 5,
-          keywords: [{ match: 'first|start|begin|early', tip: 'what you will start first' }, { match: 'because|so that|since|takes', tip: 'the reason (time needed, safety, quality)' }, { match: 'chicken|carrot|onion|potato|garlic|shallot', tip: 'a task from the actual prep list' }] },
-        { key: 'unfamiliar', label: 'Which ingredient or cut is unfamiliar, and how will you research it before you arrive?', help: 'Name it and say exactly what you will look up.', items: 1, minWords: 20, rows: 5,
-          keywords: [{ match: 'research|look up|watch|read|practice|ask', tip: 'how you will learn about it' }, { match: 'store|storage|cut|dice|shelf|temperature|prepare', tip: 'storage, shelf life or how it is cut' }] },
+        { key: 'cuts', label: 'Which cuts will you practice first, and which food will you use?', help: 'Name at least two cuts and the vegetables you will use.', items: 1, minWords: 20, rows: 5,
+          keywords: [{ match: 'dice|julienne|brunoise|chiffonade|mince|oblique|slice', tip: 'a specific cut' }, { match: 'carrot|onion|potato|celery|zucchini|pepper|basil|herb', tip: 'the food you will use' }, { match: 'because|so that|since', tip: 'why you chose them' }] },
+        { key: 'when', label: 'When will you practice, and how will you check your work against the checklist?', help: 'Say which days or times, how long, and what you will measure or look for.', items: 1, minWords: 20, rows: 5,
+          keywords: [{ match: 'day|night|morning|week|minute|hour|monday|tuesday|wednesday|thursday|friday|weekend', tip: 'when and how long' }, { match: 'checklist|measure|ruler|compare|check|inch', tip: 'how you will check your work' }, { match: 'label|store|clean|sanit', tip: 'storage or cleanup' }] },
       ],
-      model: 'The chicken portioning and the onion and potato work are time-critical because they take the longest and need correct storage, so I will start them right after the briefing. The garlic and herbs can be done later in the shift. The ingredient I know least is fingerling potatoes, so before Saturday I will look up how to store them, how long they keep once cut, and watch a video of an oblique cut so I can start with confidence.',
-    },
-  ],
-};
-
-ACTIVITIES.w1lab = {
-  end: [
-    {
-      type: 'order', title: 'The 4-hour lab timeline',
-      intro: 'Put the six blocks of Saturday’s lab in the order they happen, first block at the top.',
-      steps: ['Arrive, uniform and tool check, station assignment (0:00–0:15)', 'Pre-shift briefing: prep list, stations, yield targets (0:15–0:30)', 'Active production (0:30–2:30)', 'Quality check of finished prep (2:30–3:00)', 'Breakdown and sanitation of your station (3:00–3:30)', 'Debrief and self-assessment (3:30–4:00)'],
-      why: 'You check in, get briefed, produce for two hours, have your work checked, clean your station back to its starting condition, and then reflect.',
+      model: 'I will practice the medium dice and the julienne first, using carrots and an onion, because they show uneven cuts quickly. I will practice on Tuesday and Thursday evenings for 30 minutes. I will measure the first five pieces with a ruler and compare them with the checklist: all the same size, a curled guide hand, and a clean station at the end. Then I will label and refrigerate what I cut and wipe and sanitize my counter.',
     },
     {
-      type: 'fill', title: 'Plan your time and your product',
-      intro: 'Use the lab schedule and the prep list. Enter numbers only.',
-      rows: [
-        { label: 'How many minutes is the active production block?', unit: 'minutes', ans: 120, tol: 0.01 },
-        { label: 'All stations portion 8 chicken breasts at 6 oz each. How many ounces of chicken in all?', unit: 'oz', ans: 48, tol: 0.01 },
-        { label: 'That is how many pounds of chicken?', unit: 'lb', ans: 3, tol: 0.01 },
-        { label: 'How many minutes after you arrive does the debrief start?', unit: 'minutes', ans: 210, tol: 0.01 },
-      ],
-      why: 'Production runs from 0:30 to 2:30, which is 120 minutes. 8 × 6 = 48 oz, and 48 ÷ 16 = 3 lb. The debrief starts at 3:30 after arrival, which is 210 minutes.',
-    },
-    {
-      type: 'choice', title: 'Lab day: what would you do?',
-      intro: 'The instructor scores your uniform, tools, communication, labeling and sanitation. Choose the best action in each moment.',
-      items: [
-        { q: 'You arrive at 9:55 AM and realize you left your honing steel at home. What do you do?', opts: ['Tell the instructor at the tool check; the deficiency is documented and you continue', 'Hide it and hope no one checks', 'Go home to get it and arrive late', 'Borrow someone’s without asking'], ans: 0, why: 'Deficiencies are documented on the rubric immediately. Honest reporting is better than hiding a gap, and it is better to arrive on time.' },
-        { q: 'During the briefing you are unsure how fine the brunoise should be. When should you ask?', opts: ['Right then, because the briefing is the only window for clarifying questions', 'Later, during production', 'At the quality check', 'Never; guess from the table'], ans: 0, why: 'Students ask clarifying questions in the pre-shift briefing. Once production starts, questions cost time and mistakes.' },
-        { q: 'During production, you carry your knife past another station. What is expected?', opts: ['Blade down and behind, and call "sharp behind" as you pass', 'Walk quietly so you do not interrupt', 'Hold the knife up for better control', 'Put the knife in your apron'], ans: 0, why: 'Communication protocols are in effect for the whole production block. Safety violations are addressed immediately and documented.' },
-        { q: 'You finish your diced zucchini and put it in a clean container. What must you do before it goes to storage?', opts: ['Label it with the item, prep date, use-by date and your initials, and store it correctly', 'Leave it on the counter for the instructor', 'Cover it and hope it is recognized', 'Mix it with the celery'], ans: 0, why: 'Labeling is scored at the quality check, along with cut uniformity, dimensions and safe temperatures.' },
-        { q: 'At 3:00 PM your station has been used but the instructor is busy elsewhere. What is your responsibility during breakdown?', opts: ['Wipe surfaces, clean and return equipment, sweep the floor, and return the station to its starting condition', 'Clean only your cutting board', 'Wait for the instructor', 'Leave the sanitizing to someone else'], ans: 0, why: 'Students are responsible for their full station. It is returned to the condition it was in when you started.' },
-        { q: 'At the quality check, the instructor says your julienne carrots are uneven in length. What is the best response?', opts: ['Listen, take the feedback, and note it for your self-assessment', 'Explain why it was not your fault', 'Hide the tray', 'Remake all carrots without asking'], ans: 0, why: 'The instructor gives verbal feedback on each item. Taking it calmly, without defending, shows professional maturity and feeds your self-assessment.' },
-      ],
-    },
-    {
-      type: 'match', title: 'What does the instructor look for?',
-      intro: 'Match each observation to the area it is scored under.',
-      options: ['Uniform and tools', 'Communication calls', 'Cut quality', 'Labeling and storage', 'Station sanitation'],
-      rows: [{ label: 'A closed knife roll with all five pieces', ans: 0 }, { label: 'Saying "Heard" after a direction', ans: 1 }, { label: 'Carrot julienne that is all ⅛ inch and the same length', ans: 2 }, { label: 'A container with name, dates and initials', ans: 3 }, { label: 'A wiped counter and swept floor at the end', ans: 4 }],
-      why: 'The rubric covers the full picture: how you arrive, how you communicate, what you produce, how you label and store it, and how you leave your station.',
-    },
-    {
-      type: 'reflect', title: 'After the lab: your self-assessment',
-      intro: 'Do this after Saturday’s lab, against the rubric. Be honest and specific. Write in full sentences.',
-      prompts: [
-        { key: 'well', label: 'What went well? Give at least two examples from the lab.', help: 'Name the task and what you did.', items: 1, minWords: 20, rows: 5,
-          keywords: [{ match: 'cut|dice|julienne|brunoise|chiffonade|mince', tip: 'a specific cut or task' }, { match: 'label|sanit|uniform|knife|communicat|heard|behind|sharp', tip: 'a scored area such as labeling or communication' }] },
-        { key: 'improve', label: 'What will you improve before Lab 2, and how?', help: 'Name one weakness and one action you will take.', items: 1, minWords: 20, rows: 5,
-          keywords: [{ match: 'practice|improve|work on|focus|next time|will', tip: 'what you will do about it' }, { match: 'because|so that|since', tip: 'why it matters' }] },
-      ],
-      model: 'My knife grip and the labeling went well: I used the pinch grip on every cut and my containers had name, dates and initials. I called "sharp behind" each time I walked past. I need to improve the uniformity of my julienne because the carrot pieces were uneven in length. Before the next lab I will practice julienne on a bag of carrots twice this week and measure the pieces against the ⅛ inch standard.',
+      type: 'match', title: 'Self-check: which checklist area is it?',
+      intro: 'Match each thing you notice during your practice to the checklist area it belongs to.',
+      options: ['Grip and safety', 'Cut size', 'Labeling and storage', 'Station cleanup'],
+      rows: [{ label: 'Your guide-hand fingertips stay curled behind the knuckles', ans: 0 }, { label: 'Your carrot julienne pieces are all about ⅛ inch wide', ans: 1 }, { label: 'The container shows the item, prep date and use-by date', ans: 2 }, { label: 'The board and counter are wiped and sanitized at the end', ans: 3 }],
+      why: 'A good checklist covers how you hold the knife, what you produced, how you stored it and how you left your station. Checking each area keeps you honest.',
     },
   ],
 };
