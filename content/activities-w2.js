@@ -1,4 +1,4 @@
-/* Week 2 (w2d1 to w2lab): Food Safety Fundamentals for the ServSafe Food Handler exam. */
+/* Week 2 (w2d1 to w2d4): Food Safety Fundamentals. */
 ACTIVITIES.w2d1 = {
   p1: [
     { type: 'diagram', svg: 'fattom', title: 'FAT TOM: how bacteria grow', caption: 'Food, Acidity, Temperature, Time, Oxygen, Moisture. Take away any one condition and growth slows or stops. Temperature and time are the two you control most on the line.' },
@@ -20,7 +20,7 @@ ACTIVITIES.w2d1 = {
       items: [
         { q: 'A pan of cooked rice sits on the counter at room temperature for the whole afternoon. Which FAT TOM conditions are helping bacteria grow?', opts: ['Temperature and time, plus the food and moisture already in the rice', 'Only oxygen', 'None, because the rice is cooked', 'Only acidity'], ans: 0, why: 'Cooked rice is food with moisture. Room temperature is inside 41 to 135°F, and hours go by. That combination lets bacteria grow.' },
         { q: 'A nursing home kitchen and a college cafeteria serve the same dish. Why does the nursing home need extra care?', opts: ['Hot food cools faster there', 'Older adults face higher risk of severe illness or death from the same exposure', 'Older adults eat more food', 'The rules are different for older people'], ans: 1, why: 'The elderly, the immunocompromised, pregnant women, infants and young children are high-risk populations. The same exposure can hurt them more.' },
-        { q: 'Which list is the set of must-know pathogens for ServSafe?', opts: ['Salmonella Typhi, Shigella, Shiga toxin-producing E. coli, Hepatitis A, Norovirus, Nontyphoidal Salmonella', 'Only Salmonella and E. coli', 'Rust, mold and yeast', 'Chlorine, iodine and quat'], ans: 0, why: 'These are the Big 6 pathogens. Learn all six by name.' },
+        { q: 'Which list is the set of Big 6 pathogens that every food handler must know?', opts: ['Salmonella Typhi, Shigella, Shiga toxin-producing E. coli, Hepatitis A, Norovirus, Nontyphoidal Salmonella', 'Only Salmonella and E. coli', 'Rust, mold and yeast', 'Chlorine, iodine and quat'], ans: 0, why: 'These are the Big 6 pathogens. Learn all six by name.' },
       ],
     },
   ],
@@ -43,20 +43,28 @@ ACTIVITIES.w2d1 = {
   ],
   p3: [
     {
-      type: 'choice', title: 'ServSafe readiness',
+      type: 'choice', title: 'Why food handler knowledge matters',
       items: [
-        { q: 'When should you activate your NRAEF account?', opts: ['The night before the exam', 'This week, if you have not already', 'After the exam', 'Only if you fail'], ans: 1, why: 'An active account lets you use the practice quizzes and track your progress. The practice exam in Lab 2 needs it.' },
-        { q: 'You log in to NRAEF and cannot find the practice quiz. What is the best next step?', opts: ['Give up on practicing', 'Use the platform orientation to find it, and ask your instructor if you are still stuck', 'Wait until Lab 4', 'Make a new account every day'], ans: 1, why: 'The orientation shows how to move through modules and quizzes. Asking early keeps you on track.' },
+        { q: 'Why should everyone who handles food learn the basics of food safety?', opts: ['One small mistake, such as poor handwashing or leaving food in the danger zone, can make many people sick', 'Only managers need to know it', 'It only matters during an inspection', 'It is only about paperwork'], ans: 0, why: 'Everyone who touches food can spread illness. Good habits protect customers, coworkers and your business.' },
+        { q: 'Your area requires food handlers to have a food handler card. What is the best step?', opts: ['Look up your local health department rules and take an accredited food handler course or exam if your area requires it', 'Assume this course covers it', 'Ignore it until an inspector asks', 'Ask a friend to take it for you'], ans: 0, why: 'This course teaches the knowledge but does not include or require an exam. If your area requires a food handler card, take an accredited course separately.' },
+        { q: 'Which topic is part of basic food safety training for food handlers?', opts: ['Time and temperature control, personal hygiene, cleaning and sanitizing, and preventing cross-contamination', 'Choosing a menu font', 'Writing a business slogan', 'Setting a price for catering'], ans: 0, why: 'Food handler training focuses on the habits that prevent foodborne illness. You will cover each one in this week.' },
+        { q: 'Why do you learn the Big 6 pathogens and the danger zone (41 to 135°F) by heart?', opts: ['They help you spot risks quickly and make safe choices without looking anything up', 'They are only for trivia', 'They only matter in large restaurants', 'They are the same in every food'], ans: 0, why: 'Knowing the numbers and the illnesses lets you act quickly and correctly when something looks wrong.' },
       ],
     },
     {
+      type: 'order', title: 'Build your food safety study habit',
+      intro: 'Put these steps in a sensible order for learning a new food safety topic on your own, first step at the top.',
+      steps: ['Read the lesson part slowly', 'Watch the linked video', 'Do the activity and read why each answer is right', 'Write the key numbers on a flash card', 'Take the quiz', 'Review any missed questions'],
+      why: 'Read first, then watch, then practice and check. Flash cards fix the numbers in memory, the quiz shows what you know, and reviewing misses closes the gaps.',
+    },
+    {
       type: 'reflect', title: 'Spot your early-warning signals',
-      intro: 'Studying for an exam while working can add stress. Noticing it early helps you stay in the program.',
+      intro: 'Studying on your own while juggling work and family can add stress. Noticing it early helps you keep going.',
       prompts: [
-        { key: 'signals', label: 'Name three early-warning signs that stress is building for you, and one thing you will do about each.', help: 'Think about sleep, mood, focus, and skipping class or study.', items: 1, minWords: 20, rows: 5,
+        { key: 'signals', label: 'Name three early-warning signs that stress is building for you, and one thing you will do about each.', help: 'Think about sleep, mood, focus, and putting off your study time.', items: 1, minWords: 20, rows: 5,
           keywords: [{ match: 'sleep|tired|energy', tip: 'sleep or energy changes' }, { match: 'skip|late|miss|avoid|put off', tip: 'avoiding class or study' }, { match: 'talk|ask|call|plan|schedule|break', tip: 'a specific action you will take' }] },
       ],
-      model: 'My early signs are sleeping badly, getting short with my family, and putting off my study time. When I sleep badly I will stop studying by 9 and go to bed. When I get short with people I will take a ten minute walk. When I put off studying I will text my instructor or a classmate and set a time.',
+      model: 'My early signs are sleeping badly, getting short with my family, and putting off my study time. When I sleep badly I will stop studying by 9 and go to bed. When I get short with people I will take a ten minute walk. When I put off studying I will text a friend or family member and set a time to study.',
     },
   ],
 };
@@ -225,47 +233,6 @@ ACTIVITIES.w2d4 = {
         { q: 'Which is something a health inspector checks?', opts: ['Temperatures, storage order, labeling and handwashing sinks that meet the rules', 'The menu prices', 'The color of the walls', 'Staff hair color'], ans: 0, why: 'Inspectors also check equipment sanitation and pest evidence.' },
         { q: 'What can a failed inspection lead to?', opts: ['Nothing', 'A fine, closure or loss of license', 'A new menu', 'A bonus'], ans: 1, why: 'The stakes are real, so work to standard every shift, not just on inspection day.' },
       ],
-    },
-  ],
-};
-
-ACTIVITIES.w2lab = {
-  end: [
-    {
-      type: 'order', title: 'Practice exam readiness',
-      intro: 'Put the Lab 2 day in order, from before you arrive to what you do after.',
-      steps: ['Make sure your NRAEF account is active', 'Arrive at Parsley’s Kitchen by 10:00 AM', 'Take the proctored practice exam', 'Review your score individually with the instructor', 'Use the domain breakdown to target your study time', 'Rotate through the kitchen safety stations'],
-      why: 'Have an active account before you arrive, be on time, take the practice exam, review your score, then use the domain breakdown to focus study before the Lab 4 exam.',
-    },
-    {
-      type: 'fill', title: 'Temperature check drill',
-      intro: 'Type the temperature in °F.',
-      rows: [{ label: 'Cook poultry to', unit: '°F', ans: 165 }, { label: 'Cook ground beef to', unit: '°F', ans: 155 }, { label: 'Cook eggs and whole cuts of pork to', unit: '°F', ans: 145 }, { label: 'Cold food must arrive at or below', unit: '°F', ans: 41 }, { label: 'Frozen food must arrive at or below', unit: '°F', ans: 0 }],
-      why: 'Poultry 165, ground meat 155, eggs and whole cuts of pork 145, cold 41 or below, frozen 0 or below.',
-    },
-    {
-      type: 'match', title: 'Sanitizer station: match the concentration',
-      options: ['50 to 100 ppm', '200 to 400 ppm', '12.5 to 25 ppm'],
-      rows: [{ label: 'Chlorine', ans: 0 }, { label: 'Quat', ans: 1 }, { label: 'Iodine', ans: 2 }, { label: 'Test strips are used at the start of each service for chlorine', ans: 0 }],
-      why: 'Chlorine 50 to 100 ppm, quat 200 to 400 ppm, iodine 12.5 to 25 ppm. Always test before service.',
-    },
-    {
-      type: 'choice', title: 'Cross-contamination walk-throughs',
-      items: [
-        { q: 'You cut raw salmon on the blue board, then a cook uses the same knife on a fruit salad. What went wrong?', opts: ['Nothing', 'Cross-contamination from a raw protein to a ready-to-eat food; wash, rinse, sanitize first', 'The board color', 'The fruit was too cold'], ans: 1, why: 'Tools must be cleaned and sanitized between tasks, especially between raw proteins and ready-to-eat foods.' },
-        { q: 'In the walk-in, which storage order is safest from top to bottom?', opts: ['Raw chicken on top, ready-to-eat on bottom', 'Ready-to-eat on top, then seafood, whole cuts, ground meat, poultry on the bottom', 'Any order if covered', 'Produce on the floor'], ans: 1, why: 'Store by the cooking temperature needed: ready-to-eat on top, poultry on the bottom, so raw juices never drip on food that gets no more cooking.' },
-        { q: 'A cook handles raw ground beef, then picks up buns with the same gloves. What should happen?', opts: ['Continue', 'Change gloves after washing hands', 'Wipe the gloves', 'Add sanitizer to the buns'], ans: 1, why: 'Gloves must be changed after raw proteins, and hands washed.' },
-        { q: 'You wipe a counter with a dry cloth that has been lying on the counter all shift. What is the problem?', opts: ['None', 'Cloths should be kept in tested sanitizer solution', 'The cloth is too big', 'The counter is wet'], ans: 1, why: 'A dry cloth on the counter spreads pathogens. Keep cloths in sanitizer solution that is tested and changed.' },
-      ],
-    },
-    {
-      type: 'reflect', title: 'My weakest domain and my plan',
-      intro: 'After your practice exam and the domain breakdown, write your plan for the Lab 4 exam. If you are not sure yet, pick the topic you find hardest.',
-      prompts: [
-        { key: 'plan', label: 'Name your weakest domain, why it is hard for you, and exactly how you will improve it before the Lab 4 exam.', help: 'Include what you will study, when, and how you will check your progress.', items: 1, minWords: 30, rows: 7,
-          keywords: [{ match: 'weak|hard|struggle|missed|low', tip: 'which domain and why it is hard' }, { match: 'quiz|practice|flash|review|read|study', tip: 'what you will study or practice' }, { match: 'week|day|night|morning|schedule|minutes|hour', tip: 'when you will do it' }] },
-      ],
-      model: 'My weakest domain was time and temperature control. I mixed up the cooking temperatures for ground meat and whole cuts. Before the Lab 4 exam I will make flash cards for every temperature and cooling time and review them for 15 minutes each morning. I will redo the NRAEF practice quiz on that domain every Sunday and ask my instructor about anything I still miss.',
     },
   ],
 };

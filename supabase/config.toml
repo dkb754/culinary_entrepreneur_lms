@@ -18,5 +18,8 @@ verify_jwt = false
 verify_jwt = false
 [functions.lms-api-v2]
 verify_jwt = false
+[functions.cst-async-api]
+verify_jwt = false
+
 [functions.send-checkins]
 verify_jwt = false

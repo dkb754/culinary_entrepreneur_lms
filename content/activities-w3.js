@@ -1,6 +1,6 @@
 /* Week 3 activities: costing, pricing, menus, business formats, customers and permits. */
 
-/* ---- Monday: food cost, pricing, costing exercise ---------------------------------------------------------------- */
+/* ---- food cost, pricing, costing exercise ---------------------------------------------------------------- */
 ACTIVITIES.w3d1 = {
   p1: [
     {
@@ -71,10 +71,21 @@ ACTIVITIES.w3d1 = {
       ],
       model: '3 oz chicken, EP weight, bought as 5 lb packs with some trim loss\n2 tablespoons dressing, made in batches from mayonnaise and herbs\n1 roll, bought in a pack of 12 from the bakery\n1 oz lettuce and tomato, EP weight after washing and trimming\nPackaging: one paper tray and napkin per portion',
     },
+    {
+      type: 'fill', title: 'Costing worksheet: practice recipe',
+      intro: 'Practice recipe: Herb Chicken Rice Bowls, a batch of 8 portions, as it might appear on a standardized card. Weights you record at the start: chicken 5 lbs AP at $3.20 per lb (4 lbs EP after trimming); vegetables $6.00; sauce $4.00; rice $2.00. Target food cost: 35% (a pop-up range).',
+      rows: [
+        { label: 'Chicken yield percentage (EP ÷ AP)', unit: '%', ans: 80, tol: 0.1 },
+        { label: 'Total ingredient cost for the batch', unit: '$', ans: 28, tol: 0.01 },
+        { label: 'Plate cost (one portion)', unit: '$', ans: 3.5, tol: 0.01 },
+        { label: 'Minimum sale price at a 35% target', unit: '$', ans: 10, tol: 0.01 },
+      ],
+      why: 'Yield = 4 ÷ 5 = 80%. Chicken cost is 5 lbs AP × $3.20 = $16.00. Batch total = 16.00 + 6.00 + 4.00 + 2.00 = $28.00. Plate cost = 28.00 ÷ 8 = $3.50. Price = 3.50 ÷ 0.35 = $10.00.',
+    },
   ],
 };
 
-/* ---- Tuesday: menu engineering, consistency, capacity ------------------------------------------------------------ */
+/* ---- menu engineering, consistency, capacity ------------------------------------------------------------ */
 ACTIVITIES.w3d2 = {
   p1: [
     { type: 'diagram', svg: 'menuquad', title: 'Menu engineering matrix', caption: 'Stars: high profit, high popularity. Plowhorses: low profit, high popularity. Puzzles: high profit, low popularity. Dogs: low profit, low popularity, and candidates for removal.' },
@@ -136,7 +147,7 @@ ACTIVITIES.w3d2 = {
   ],
 };
 
-/* ---- Wednesday: business formats, sourcing ----------------------------------------------------------------------- */
+/* ---- business formats, sourcing ----------------------------------------------------------------------- */
 ACTIVITIES.w3d3 = {
   p1: [
     {
@@ -201,7 +212,7 @@ ACTIVITIES.w3d3 = {
   ],
 };
 
-/* ---- Thursday: customers, demand, permits ------------------------------------------------------------------------ */
+/* ---- customers, demand, permits ------------------------------------------------------------------------ */
 ACTIVITIES.w3d4 = {
   p1: [
     {
@@ -209,10 +220,10 @@ ACTIVITIES.w3d4 = {
       intro: 'Describe one specific customer for your concept in the terms the lesson lists. Avoid "everyone".',
       prompts: [
         { key: 'who', label: 'Who is your customer?', help: 'Include age range, income level, geography, and values (for example health-conscious, culturally connected, convenience-driven).', items: 1, minWords: 25, rows: 5,
-          keywords: [{ match: 'age|aged|\\d+', tip: 'an age range' }, { match: 'income|budget|afford|\\$', tip: 'income level' }, { match: 'neighborhood|city|Richmond|local|area|live', tip: 'where they live' }, { match: 'health|cultur|conven|value', tip: 'their values' }] },
+          keywords: [{ match: 'age|aged|\\d+', tip: 'an age range' }, { match: 'income|budget|afford|\\$', tip: 'income level' }, { match: 'neighborhood|city|town|local|area|live', tip: 'where they live' }, { match: 'health|cultur|conven|value', tip: 'their values' }] },
         { key: 'buy', label: 'Where do they currently buy what you sell?', help: 'Name the specific places.', items: 1, minWords: 12, rows: 3 },
       ],
-      model: 'My customer is a woman aged 28 to 45 with a household income around $60,000 who lives in or near the Fan district in Richmond. She is health-conscious and likes food with a story. Right now she buys lunch from the Saturday farmers market and from two local cafes near her office.\nShe currently buys prepared meals at the farmers market and from the cafes near her work.',
+      model: 'My customer is a woman aged 28 to 45 with a household income around $60,000 who lives in or near the town center. She is health-conscious and likes food with a story. Right now she buys lunch from the weekend farmers market and from two local cafes near her office.\nShe currently buys prepared meals at the farmers market and from the cafes near her work.',
     },
     {
       type: 'order', title: 'Test demand before you commit',
@@ -250,40 +261,6 @@ ACTIVITIES.w3d4 = {
         { q: 'You will cook in a commercial kitchen and sell non-cottage food products. What must happen before you open?', opts: ['Nothing', 'You must pass a health department inspection', 'Only register with the SCC', 'Just get a tent'], ans: 1, why: 'Any food business operating from a commercial kitchen or selling non-cottage food products must pass a health department inspection before opening.' },
         { q: 'You are not sure what rules apply to your specific farmers market product. What does the lesson tell you to do?', opts: ['Assume none apply', 'Check product-specific requirements with VDACS', 'Ask a customer', 'Wait until someone complains'], ans: 1, why: 'VDACS regulates cottage food operations, farmers market vendors and certain food products, so the lesson tells you to check product-specific requirements.' },
       ],
-    },
-  ],
-};
-
-/* ---- Saturday Lab 3: production and costing in action ------------------------------------------------------------ */
-ACTIVITIES.w3lab = {
-  end: [
-    {
-      type: 'fill', title: 'Costing worksheet: practice recipe',
-      intro: 'Practice recipe: Herb Chicken Rice Bowls, a batch of 8 portions, as it might appear on a standardized card. Weights recorded at the start: chicken 5 lbs AP at $3.20 per lb (4 lbs EP after trimming); vegetables $6.00; sauce $4.00; rice $2.00. Target food cost: 35% (a pop-up range).',
-      rows: [
-        { label: 'Chicken yield percentage (EP ÷ AP)', unit: '%', ans: 80, tol: 0.1 },
-        { label: 'Total ingredient cost for the batch', unit: '$', ans: 28, tol: 0.01 },
-        { label: 'Plate cost (one portion)', unit: '$', ans: 3.5, tol: 0.01 },
-        { label: 'Minimum sale price at a 35% target', unit: '$', ans: 10, tol: 0.01 },
-      ],
-      why: 'Yield = 4 ÷ 5 = 80%. Chicken cost is 5 lbs AP × $3.20 = $16.00. Batch total = 16.00 + 6.00 + 4.00 + 2.00 = $28.00. Plate cost = 28.00 ÷ 8 = $3.50. Price = 3.50 ÷ 0.35 = $10.00.',
-    },
-    {
-      type: 'order', title: 'The flow of lab day',
-      intro: 'Put the lab flow in order, first step at the top.',
-      steps: ['Receive and read your standardized recipe card', 'Weigh ingredients and record the weights at the start', 'Produce the dish while costing it on the Recipe Cost Sheet', 'Plate and present the finished dish to the cohort', 'Take part in peer critique', 'Submit your costed recipe card at the end of lab'],
-      why: 'Start from the standardized card, weigh and record before you cook, produce and cost together, plate and present, hear critique, and submit the costed card at the end.',
-    },
-    {
-      type: 'reflect', title: 'Post-lab critique',
-      intro: 'Look at your cost sheet and the feedback you received.',
-      prompts: [
-        { key: 'sheet', label: 'What did the cost sheet show me?', help: 'Name a specific cost, yield or plate cost number that surprised or taught you something.', items: 1, minWords: 20, rows: 4,
-          keywords: [{ match: 'cost|plate|yield|price|percent|%', tip: 'a specific cost or percentage' }, { match: 'weigh|weight|EP|AP|trim', tip: 'the recorded weights' }] },
-        { key: 'change', label: 'What would I change next time?', help: 'About the recipe, portion, price or your process.', items: 1, minWords: 20, rows: 4,
-          keywords: [{ match: 'portion|recipe|price|process|order|prep', tip: 'a specific change' }, { match: 'because|so that|to reduce|to improve', tip: 'why that change helps' }] },
-      ],
-      model: 'The cost sheet showed me that my chicken cost more than I expected because the trim loss meant I paid for 5 lbs but only used 4, so my plate cost was higher than the invoice price suggested.\nNext time I would weigh the trim as I go, tighten my portion so the plate cost stays closer to my target, and check the price against what the market will pay before I commit to it.',
     },
   ],
 };
