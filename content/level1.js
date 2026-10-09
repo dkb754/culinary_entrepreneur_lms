@@ -50,7 +50,7 @@ const LEVEL1 = {
     },
     {
       id: 'w1d2', week: 1, dow: 'Tuesday', date: 'October 13', short: 'Oct 13', module: 'CST M1: Knife Skills & Ingredients',
-      layer: 'KRP — industry reality framing', hours: '~3 hours',
+      layer: 'KRP — see the job as it really is', hours: '~3 hours',
       topics: ['Knife safety and grip', 'Classic cuts: large, medium and small dice, julienne, chiffonade', 'The 25-ingredient library'],
       resources: [
         { t: 'video', title: 'Basic Knife Skills and Cuts', meta: 'YouTube', url: YT('VJNA4vrdWec') },
@@ -60,7 +60,7 @@ const LEVEL1 = {
     },
     {
       id: 'w1d3', week: 1, dow: 'Wednesday', date: 'October 14', short: 'Oct 14', module: 'CST M1: Recipe Execution & Storage',
-      layer: 'KRP — cognitive load reduction', hours: '~3 hours',
+      layer: 'KRP — keep your head clear', hours: '~3 hours',
       topics: ['Standardized recipe format', 'Unit conversion and yield', 'FIFO, labeling and temperature control', 'Cross-contamination'],
       resources: [
         { t: 'video', title: 'First-In First-Out Rotation and Labeling', meta: 'YouTube', url: YT('mMN5QKiqZf4') },
@@ -70,7 +70,7 @@ const LEVEL1 = {
     },
     {
       id: 'w1d4', week: 1, dow: 'Thursday', date: 'October 15', short: 'Oct 15', module: 'CST M1: Production & Team Communication',
-      layer: 'KRP — professional identity', hours: '~3 hours',
+      layer: 'KRP — who you are at work', hours: '~3 hours',
       topics: ['Prep lists', 'Production timelines', 'Kitchen calls and acknowledgments', 'Line communication standards'],
       resources: [
         { t: 'video', title: '10 Phrases Used in Every Kitchen', meta: 'YouTube', url: YT('8lrZdejfe58') },
@@ -79,12 +79,12 @@ const LEVEL1 = {
       quiz: 'w1d4',
       file: {
         label: 'Honest Map', due: 'Thursday, Oct 15', krp: 'KRP Deliverable 1',
-        blurb: 'Your Honest Map: an accurate picture of what working in food really involves and where you stand today. Follow the template your instructor gives you.',
+        blurb: 'Your Honest Map: an accurate picture of what working in food really involves and where you stand today. Build it in Monday’s lesson (Part 3: The Honest Map), download your file there, improve it, and upload it here.',
       },
     },
     {
       id: 'w1lab', lab: 'lab1', week: 1, dow: 'Saturday', date: 'October 17', short: 'Oct 17', module: 'LAB 1 — CST Assessment',
-      layer: 'KRP — real conditions exposure',
+      layer: 'KRP — feel the real kitchen',
       activities: ['Mise en place setup', 'Knife cuts assessed against the rubric', 'Storage and labeling check', 'Prep list execution', 'Team debrief'],
       assessment: 'CST Rubric (100 points): Arrival/Setup, Knife Skills, Storage, Production',
       unlocks: 'Your instructor confirms your attendance at the lab. That unlocks Weeks 2–4.',
@@ -93,7 +93,7 @@ const LEVEL1 = {
     // ---------------- WEEK 2 ----------------
     {
       id: 'w2d1', week: 2, dow: 'Monday', date: 'October 19', short: 'Oct 19', module: 'ServSafe: Foodborne Illness & Contamination',
-      layer: 'KRP Phase 1 · Week 2 — Identity Statement', hours: '~3 hours',
+      layer: 'KRP Phase 2 · Week 2 — Know Your Warning Signs', hours: '~3 hours',
       topics: ['Causes of foodborne illness', 'FAT TOM', 'Biological, chemical and physical hazards', 'High-risk populations'],
       resources: [
         { t: 'video', title: 'What Is FAT TOM?', meta: 'YouTube', url: YT('fdLeMQ0HqbM') },
@@ -145,7 +145,7 @@ const LEVEL1 = {
     // ---------------- WEEK 3 ----------------
     {
       id: 'w3d1', week: 3, dow: 'Monday', date: 'October 26', short: 'Oct 26', module: 'Costing & Pricing Basics',
-      layer: 'KRP Phase 2 · Week 3 — Stress Recognition', hours: '~3 hours',
+      layer: 'KRP Phase 2 · Week 3 — Change How You See Pressure', hours: '~3 hours',
       topics: ['Food cost percentage', 'Recipe costing', 'EP vs AP', 'Plate cost', 'Pricing for profit', 'Break-even intro'],
       resources: [
         { t: 'read', title: 'Calculating Food Cost Percentage', meta: 'RestaurantOwner.com', url: 'https://www.restaurantowner.com/public/4753.cfm' },
@@ -165,7 +165,7 @@ const LEVEL1 = {
     },
     {
       id: 'w3d3', week: 3, dow: 'Wednesday', date: 'October 28', short: 'Oct 28', module: 'Food Business Formats',
-      layer: 'KRP — Cognitive Reframing', hours: '~3 hours',
+      layer: 'KRP — Build Your People', hours: '~3 hours',
       topics: ['Booth, pop-up, cottage food, catering and food truck: what each one takes', 'Pros and cons', 'Capital requirements'],
       resources: [
         { t: 'video', title: 'Starting a Cottage Food Business from Home', meta: 'YouTube', url: YT('c2aXLbaWeGg') },
@@ -205,7 +205,7 @@ const LEVEL1 = {
     // ---------------- WEEK 4 ----------------
     {
       id: 'w4d1', week: 4, dow: 'Monday', date: 'November 2', short: 'Nov 2', module: 'Permits & Licensing — Intro',
-      layer: 'KRP Phase 2 · Week 4 — Social Support', hours: '~3 hours',
+      layer: 'KRP Phase 2 · Week 4 — Recharge So You Can Keep Going', hours: '~3 hours',
       topics: ['Virginia food handler permit', 'Home-based and cottage food law', 'Health department inspection basics', 'VDACS requirements'],
       resources: [
         { t: 'read', title: 'Applying for a Food Permit (Virginia Department of Health)', meta: 'VDH', url: 'https://www.vdh.virginia.gov/environmental-health/food-safety-in-virginia/foodapplication/' },
@@ -260,9 +260,16 @@ const LEVEL1 = {
 
   // KRP skill clusters (Phase 2) — embedded in the weekly modules and labs
   krp: {
+    // The four Phase 2 skills, in plain language (student-facing)
+    skills: [
+      { name: 'Know Your Warning Signs', when: 'Mon, Oct 19', day: 'w2d1', desc: 'Learn to spot when stress is building before it takes you out. You’ll identify your own signals — physical, mental, and emotional — so you can catch problems early.' },
+      { name: 'Change How You See Pressure', when: 'Mon, Oct 26', day: 'w3d1', desc: 'Hard moments in the kitchen are part of the job, not a sign you don’t belong. This skill teaches you to reframe high-pressure situations as performance conditions you can handle.' },
+      { name: 'Build Your People', when: 'Wed, Oct 28', day: 'w3d3', desc: 'No successful food business runs alone. You’ll identify the people in your corner — mentors, peers, customers — and learn how to lean on that network when things get tough.' },
+      { name: 'Recharge So You Can Keep Going', when: 'Mon, Nov 2', day: 'w4d1', desc: 'Burnout is real in this industry. This skill is about knowing how to recover between shifts and seasons so you stay in the game long-term.' },
+    ],
     phases: [
       { n: 1, name: 'Conceptualization', weeks: 'Weeks 1–2', focus: 'Build accurate expectations and a professional identity.', out: 'Honest Map (Week 1) · Professional Identity Statement (Week 2)' },
-      { n: 2, name: 'Skill Acquisition', weeks: 'Weeks 3–4', focus: 'Four psychological skill clusters taught through CST framing.', out: 'Stress Recognition (Oct 26) · Cognitive Reframing (Oct 28) · Social Support (Nov 2) · Recovery (embedded in labs)' },
+      { n: 2, name: 'Skill Acquisition', weeks: 'Weeks 3–4', focus: 'Four skills for handling pressure, taught alongside your kitchen training.', out: 'Know Your Warning Signs (Oct 19) · Change How You See Pressure (Oct 26) · Build Your People (Oct 28) · Recharge So You Can Keep Going (Nov 2)' },
       { n: 3, name: 'Application', weeks: 'Week 4 + after the course', focus: 'Your 90-day plan and first-shift preparation.', out: 'KRP Portfolio · a 90-day check-in email after Lab 4' },
     ],
     items: [
