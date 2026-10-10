@@ -1197,6 +1197,172 @@ body {
 
 
 /* ============================================================
+   LEVEL HUB — four-level program map shown after login
+   ============================================================ */
+.level-hub { padding: 8px 0 32px; }
+.level-hub-header { margin-bottom: 32px; }
+.level-hub-header .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green-bright);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.level-hub-header h2 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  color: var(--green-dark);
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+.level-hub-header p { color: var(--gray-600); font-size: 14px; }
+
+.level-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.level-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.12s;
+  overflow: hidden;
+}
+.level-card.unlocked {
+  border-color: var(--green-mid);
+  cursor: pointer;
+}
+.level-card.unlocked:hover {
+  border-color: var(--green-bright);
+  box-shadow: 0 6px 24px rgba(26,58,42,0.14);
+  transform: translateY(-2px);
+}
+.level-card.unlocked:active { transform: translateY(0); }
+.level-card.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.level-card.current {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,168,67,0.18);
+}
+.level-card.current::before {
+  content: 'YOUR LEVEL';
+  position: absolute;
+  top: 12px; right: 16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+}
+
+.level-icon {
+  width: 52px; height: 52px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.level-icon.green  { background: #e6f0ea; }
+.level-icon.gold   { background: #fdf3e3; }
+.level-icon.blue   { background: #e8f0ff; }
+.level-icon.orange { background: #fdeee8; }
+
+.level-info { flex: 1; min-width: 0; }
+.level-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gray-600);
+  margin-bottom: 3px;
+}
+.level-name {
+  font-family: var(--font-display);
+  font-size: 19px;
+  color: var(--green-dark);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.level-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+.level-tag.tag-async  { background: #e6f0ea; color: var(--green-mid); }
+.level-tag.tag-cohort { background: #fdf3e3; color: #8a6012; }
+.level-tag.tag-employ { background: #e8f0ff; color: #2a4db5; }
+.level-tag.tag-adv    { background: #fdeee8; color: #8a2a0a; }
+.level-desc {
+  font-size: 13px;
+  color: var(--gray-600);
+  line-height: 1.55;
+}
+.level-lock {
+  font-size: 22px;
+  color: var(--gray-600);
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+.level-arrow {
+  font-size: 20px;
+  color: var(--green-bright);
+  flex-shrink: 0;
+  margin-left: 4px;
+  transition: transform 0.15s;
+}
+.level-card.unlocked:hover .level-arrow { transform: translateX(4px); }
+
+.level-progress-bar {
+  height: 4px;
+  background: var(--gray-200);
+  border-radius: 2px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+.level-progress-fill {
+  height: 100%;
+  background: var(--green-bright);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.hub-ibm-note {
+  margin-top: 20px;
+  background: #eef4ff;
+  border: 1px solid #c5d8f8;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: #1a3a7a;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.hub-ibm-note .ibm-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+
+@media (max-width: 600px) {
+  .level-card { padding: 18px 16px; gap: 14px; }
+  .level-icon { width: 42px; height: 42px; font-size: 18px; }
+  .level-name { font-size: 16px; }
+}
+
+/* ============================================================
    ENHANCEMENTS — submissions, progress states, a11y, mobile
    ============================================================ */
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
@@ -1489,6 +1655,7 @@ const LABS = DAYS.filter(d => d.lab);
 
 let sessionToken = null;
 let currentUser = null;
+let currentLevel = 'L1';   // returned by validate-login; gates the hub
 let isAdmin = false;
 let settings = { published_quizzes: [] };
 let cstResults = [];          // this student's CST rubric results [{lab,total,band}]
@@ -1699,7 +1866,138 @@ function renderSidebar() {
   document.getElementById('sidebar').innerHTML = h;
 }
 
+/* ── Level order and metadata ───────────────────────────────── */
+const LEVELS_META = [
+  {
+    id: 'L1',
+    num: 'Level I',
+    name: 'Culinary Systems Training',
+    tag: 'Self-Paced Async', tagClass: 'tag-async',
+    icon: '🍳', iconClass: 'green',
+    desc: '4 weeks of async modules, Saturday labs, ServSafe, and your Concept Brief. The foundation of everything.',
+    ibm: 'IBM SkillsBuild unlocks after Module 2 — Lifelong Professional Skills, Collaboration, Job Readiness.',
+    enterFn: () => renderLevel1Dashboard(),
+  },
+  {
+    id: 'L2',
+    num: 'Level II',
+    name: 'Culinary Entrepreneurship I',
+    tag: 'Cohort · In-Person', tagClass: 'tag-cohort',
+    icon: '📋', iconClass: 'gold',
+    desc: 'Business plan, cost controls, sales strategy, and your first real pitch. 4-week cohort with Chef Duane.',
+    ibm: 'Full IBM SkillsBuild Pathway 3 — Be an Entrepreneur, Project Management, Digital Marketing & more.',
+    enterFn: null,   // not yet built
+  },
+  {
+    id: 'L3',
+    num: 'Level III',
+    name: 'Frontline Supervisor Track',
+    tag: 'Employer-Sponsored', tagClass: 'tag-employ',
+    icon: '👨‍💼', iconClass: 'blue',
+    desc: 'Kitchen management, team leadership, and operational systems for cooks moving into supervisor roles.',
+    ibm: 'IBM SkillsBuild Pathway 2 — Frontline supervisor credential available through your employer.',
+    enterFn: null,
+  },
+  {
+    id: 'L4',
+    num: 'Level IV',
+    name: 'Culinary Entrepreneurship II',
+    tag: 'Advanced Cohort', tagClass: 'tag-adv',
+    icon: '🚀', iconClass: 'orange',
+    desc: 'Advanced business operations, financial modeling with AI tools, and scaling your culinary venture.',
+    ibm: 'AI-powered financial planning via IBM SkillsBuild — "How Smart Is Your Spending?" and Operations Management.',
+    enterFn: null,
+  },
+];
+
+/* Level rank for gate comparison */
+const LEVEL_RANK = { L1: 1, L2: 2, L3: 3, L4: 4 };
+
 function renderDashboard() {
+  renderLevelHub();
+}
+
+function renderLevelHub() {
+  const userRank = LEVEL_RANK[currentLevel] || 1;
+
+  const cards = LEVELS_META.map(lv => {
+    const rank = LEVEL_RANK[lv.id];
+    const isCurrent = lv.id === currentLevel;
+    const isUnlocked = rank <= userRank;
+    const stateClass = isCurrent ? 'unlocked current' : isUnlocked ? 'unlocked' : 'locked';
+    const clickAttr = isUnlocked
+      ? `onclick="enterLevel('${lv.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')enterLevel('${lv.id}')"`
+      : `aria-disabled="true"`;
+    const rightIcon = isUnlocked
+      ? `<div class="level-arrow">›</div>`
+      : `<div class="level-lock">🔒</div>`;
+
+    return `<div class="level-card ${stateClass}" ${clickAttr}>
+      <div class="level-icon ${lv.iconClass}">${lv.icon}</div>
+      <div class="level-info">
+        <div class="level-num">${esc(lv.num)}</div>
+        <div class="level-name">${esc(lv.name)}</div>
+        <span class="level-tag ${lv.tagClass}">${esc(lv.tag)}</span>
+        <div class="level-desc">${esc(lv.desc)}</div>
+        ${isCurrent ? `<div class="level-progress-bar"><div class="level-progress-fill" id="hub-prog-${lv.id}" style="width:0%"></div></div>` : ''}
+      </div>
+      ${rightIcon}
+    </div>`;
+  }).join('');
+
+  const ibmNote = `<div class="hub-ibm-note">
+    <div class="ibm-icon">🎓</div>
+    <div><strong>IBM SkillsBuild is embedded in every level.</strong> As a Culinary Coach learner, you have premium access to IBM SkillsBuild — professional courses that pair with each level and earn digital credentials for your résumé. Courses unlock as you progress.</div>
+  </div>`;
+
+  document.getElementById('page-dashboard').innerHTML = `
+    <div class="level-hub">
+      <div class="level-hub-header">
+        <div class="eyebrow">Culinary Coach — Your Program</div>
+        <h2 id="dash-greeting">Welcome back!</h2>
+        <p>Choose your level below. Complete each level to unlock the next.</p>
+      </div>
+      <div class="level-cards">${cards}</div>
+      ${ibmNote}
+    </div>`;
+
+  // Set greeting
+  if (currentUser) {
+    document.getElementById('dash-greeting').textContent =
+      'Welcome back, ' + currentUser.split(' ')[0] + '!';
+  }
+
+  // Fill progress bar for current level from memCache
+  setTimeout(() => updateHubProgress(), 100);
+}
+
+function updateHubProgress() {
+  const bar = document.getElementById('hub-prog-' + currentLevel);
+  if (!bar) return;
+  // Compute pct from memCache quizzes + deliverables (same logic as week bars)
+  const q = Object.values(memCache.quizzes || {}).filter(v => v >= 70).length;
+  const d = Object.values(memCache.deliverables || {}).filter(Boolean).length;
+  const totalQ = settings.published_quizzes ? settings.published_quizzes.length : 14;
+  const totalD = 4; // concept brief, menu, cost sheet, KRP
+  const pct = Math.min(100, Math.round(((q / Math.max(totalQ, 1)) * 0.6 + (d / totalD) * 0.4) * 100));
+  bar.style.width = pct + '%';
+}
+
+function enterLevel(levelId) {
+  const lv = LEVELS_META.find(l => l.id === levelId);
+  if (!lv) return;
+  if (LEVEL_RANK[levelId] > (LEVEL_RANK[currentLevel] || 1)) return; // still locked
+  if (lv.enterFn) {
+    lv.enterFn();
+  } else if (levelId === currentLevel) {
+    // Current level but no enterFn yet — fall through to L1 default
+    renderLevel1Dashboard();
+  } else {
+    showToast('This level is coming soon.', '🔜');
+  }
+}
+
+function renderLevel1Dashboard() {
   const upcoming = LABS.map(l => `<div class="upcoming-item">
       <div class="upcoming-date"><div class="month">${esc(l.short.split(' ')[0])}</div><div class="day">${esc(l.short.split(' ')[1])}</div></div>
       <div class="upcoming-divider"></div>
@@ -1711,8 +2009,13 @@ function renderDashboard() {
       <div class="wc-progress"><div class="wc-progress-fill" id="wc${w.n}-bar" style="width:0%"></div></div>
       <div class="wc-count" id="wc${w.n}-count"></div></div>`).join('');
   document.getElementById('page-dashboard').innerHTML = `
-    <div class="dash-header"><div class="eyebrow">${esc(LEVEL1.cohort)}</div><h2 id="dash-greeting">Welcome back!</h2>
-      <p>4 weeks · Mon–Thu online · Saturday labs in person · ${esc(LAB_PLACE)}</p></div>
+    <div class="dash-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <button onclick="renderLevelHub()" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--green-bright);font-family:var(--font-body);font-weight:600;padding:0;display:flex;align-items:center;gap:4px;">‹ All Levels</button>
+      </div>
+      <div class="eyebrow">${esc(LEVEL1.cohort)}</div><h2 id="dash-greeting">Welcome back!</h2>
+      <p>4 weeks · Mon–Thu online · Saturday labs in person · ${esc(LAB_PLACE)}</p>
+    </div>
     <div class="l2-banner" id="l2-banner" style="display:none">🎓 <div><strong>You're ready for Level II.</strong> You've passed ServSafe Food Handler, submitted your Concept Brief and passed every quiz. Your instructor will contact you about Culinary Entrepreneurship II.</div></div>
     <div class="stats-row">
       <div class="stat-card"><div class="stat-value" id="stat-quizzes">0</div><div class="stat-label">Quizzes Passed</div></div>
@@ -1722,6 +2025,8 @@ function renderDashboard() {
     </div>
     <div class="week-cards">${cards}</div>
     <div class="section-title">Upcoming Labs</div><div class="upcoming-list">${upcoming}</div>`;
+  // greeting
+  if (currentUser) document.getElementById('dash-greeting').textContent = 'Welcome back, ' + currentUser.split(' ')[0] + '!';
 }
 
 function resourceHtml(r) {
@@ -2710,6 +3015,7 @@ async function doLogin() {
     sessionToken = r.data.token;
     isAdmin = !!r.data.is_admin;
     currentUser = r.data.student_name;
+    currentLevel = r.data.level || 'L1';
     if (isAdmin) memCache = { ...EMPTY(), w2_unlocked: true };
     await sbLoad(currentUser);
     await launchApp();
@@ -2734,6 +3040,7 @@ function doLogout() {
   if (sessionToken) fnPost(API_FN, { token: sessionToken, action: 'logout' }, 5000).catch(() => {});
   sessionToken = null;
   currentUser = null;
+  currentLevel = 'L1';
   isAdmin = false;
   memCache = EMPTY();
   settings = { published_quizzes: [] };
