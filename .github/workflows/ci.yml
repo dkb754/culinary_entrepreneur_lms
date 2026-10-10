@@ -70,7 +70,10 @@ jobs:
         run: supabase start -x studio,imgproxy,mailpit,logflare,vector,postgres-meta,supavisor,realtime
       - name: Serve the Edge Functions
         run: |
-          nohup supabase functions serve --no-verify-jwt > functions.log 2>&1 &
+          # a stand-in for Resend so the enrollment tests can see exactly which e-mails the function sends
+          nohup node tools/mock-resend.mjs > mock-resend.log 2>&1 &
+          printf 'ENROLLMENT_RESEND_API_KEY=ci-test-key\nENROLLMENT_RESEND_API_URL=http://host.docker.internal:8788/emails\n' > supabase/functions/.env
+          nohup supabase functions serve --no-verify-jwt --env-file supabase/functions/.env > functions.log 2>&1 &
           for i in $(seq 1 90); do
             code=$(curl -s -o /dev/null -w '%{http_code}' -X OPTIONS http://127.0.0.1:54321/functions/v1/validate-login || true)
             [ "$code" = "204" ] && echo "functions up after $((i*2))s" && exit 0
@@ -83,9 +86,10 @@ jobs:
           psql "$DB_URL" -v ON_ERROR_STOP=1 -q -f tests/backend/seed.sql > /dev/null
           API_URL="$API_URL" DB_URL="$DB_URL" ANON_KEY="$ANON_KEY" node tools/backend-tests.mjs
           API_URL="$API_URL" DB_URL="$DB_URL" ANON_KEY="$ANON_KEY" node tools/backend-tests-async.mjs
+          API_URL="$API_URL" DB_URL="$DB_URL" node tools/backend-tests-enrollment.mjs
       - name: Function log (on failure)
         if: failure()
-        run: tail -80 functions.log || true
+        run: tail -80 functions.log || true; tail -20 mock-resend.log || true
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: backend-results, path: test-results/ }
