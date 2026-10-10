@@ -1,4 +1,4 @@
-/* Level II · Week 2 (week 6) activities. DRAFT. */
+/* Part 2 · Week 2 (week 6) activities. DRAFT. */
 ACTIVITIES.w6d1 = {
  "p1": [
   {

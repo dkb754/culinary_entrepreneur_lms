@@ -1,4 +1,4 @@
-/* Level II · Week 3 (week 7) quizzes, DRAFT. Every question can be answered from the matching lesson text. */
+/* Part 2 · Week 3 (week 7) quizzes, DRAFT. Every question can be answered from the matching lesson text. */
 
 QUIZ_BANK.w7d1 = {
   title: 'Quiz 23 · Production Systems & Capacity', passPct: 70,

@@ -1,4 +1,4 @@
-/* Level II · Week 1 (w5) quizzes. DRAFT. Uses Q() and QUIZ_BANK from level1-quizzes.js. */
+/* Part 2 · Week 1 (w5) quizzes. DRAFT. Uses Q() and QUIZ_BANK from level1-quizzes.js. */
 QUIZ_BANK.w5d1 = {
   title: 'Quiz 15 · Your Business Idea & Concept', passPct: 70,
   questions: [

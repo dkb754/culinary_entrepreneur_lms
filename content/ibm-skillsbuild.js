@@ -5,7 +5,7 @@
   const B = 'https://skills.yourlearning.ibm.com/';
   window.IBM_SKILLSBUILD = {
     register: { title: 'Register for IBM SkillsBuild', url: B + Q },
-    pathway1: [
+    level1: [
       { title: 'Lifelong Professional Skills', url: B + 'activity/PLAN-8AF5B141EC32' + Q },
       { title: 'Collaboration', url: B + 'channel/CNL_LCB_1568648534810' + Q },
       { title: 'Job Readiness', url: B + 'activity/PLAN-B1632133A641' + Q },

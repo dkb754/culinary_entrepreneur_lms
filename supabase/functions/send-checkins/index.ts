@@ -43,7 +43,7 @@ function message(first: string, survey: string, selfPaced = false) {
   const ask = survey
     ? `<p>Please take 3 minutes to tell us how it's going: <a href="${esc(survey)}">${esc(survey)}</a></p>`
     : `<p>Just reply to this email and tell us how it's going: are you working in food, building your business, or still planning?</p>`;
-  const when = selfPaced ? "It has been 90 days since you finished Level I of Culinary Systems Training." : "It has been 90 days since Lab 4 of Culinary Entrepreneurship I.";
+  const when = selfPaced ? "It has been 90 days since you finished Part 1 of Culinary Systems Training." : "It has been 90 days since Lab 4 of Culinary Entrepreneurship I.";
   const html = `<p>Hi ${esc(first)},</p>
 <p>${when} We would like to hear how you are doing.</p>${ask}
 <p>Open your KRP Portfolio any time to look back at your Honest Map and Professional Identity Statement.</p>
@@ -85,7 +85,7 @@ async function runAsync(survey: string): Promise<Record<string, string>> {
       .eq("student_name", r.student_name).is("checkin_sent_at", null).select("student_name");
     if (claim.error || !claim.data?.length) { results[r.student_name] = "already_claimed"; continue; }
     try {
-      await sendMail(r.checkin_email, r.student_name.split(" ")[0], survey, "90 days after Level I: how is it going?", true);
+      await sendMail(r.checkin_email, r.student_name.split(" ")[0], survey, "90 days after Part 1: how is it going?", true);
       results[r.student_name] = "sent";
     } catch (e) {
       await sb.from("student_progress").update({ checkin_sent_at: null }).eq("student_name", r.student_name);

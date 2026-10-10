@@ -1,4 +1,4 @@
-/* Level I quiz bank — DRAFT for review.
+/* Part 1 quiz bank — DRAFT for review.
  *
  * Written from standard food-safety, costing and culinary knowledge (FDA Food Code and general food handler basics).
  * NOTHING here is shown to students until you publish it: Admin → Quiz Review → Publish.

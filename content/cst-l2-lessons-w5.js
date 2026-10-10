@@ -1,4 +1,4 @@
-/* Level II · Week 1 (w5) lesson text. DRAFT. Adds to LESSONS (declared in level1-lessons.js). */
+/* Part 2 · Week 1 (w5) lesson text. DRAFT. Adds to LESSONS (declared in level1-lessons.js). */
 
 LESSONS.w5d1 = `<h4>PART 1 — The problem your food business solves</h4>
 <p>Every business that lasts does one thing well: it solves a problem for someone. In food, the problem can be small and still real. People are hungry at noon and have only twenty minutes. A family wants a birthday cake that fits a nut allergy. An office wants a lunch that is not another sandwich tray. A neighborhood has no place to buy fresh tamales on a weekday.</p>
@@ -86,7 +86,7 @@ LESSONS.w5d2 = `<h4>PART 1 — Who your customers are and how many there might b
 <li><strong>Premium:</strong> higher prices. You must give something clearly special, such as top ingredients, great service, or a strong story.</li>
 </ul>
 <p>Look at the prices you collected in Part 2. What is the typical price for a similar item (for example, a lunch plate)? Where do you want to fall? Your choice should match your concept. A premium price on plain food will not last, and a budget price on expensive ingredients can lose money on every sale.</p>
-<p>Your price also sends a message. A very low price can make people wonder about quality. Remember that price is not only what customers will pay. You must also cover your costs and have something left over. You will study that in Week 2 of Level II. For now, choose a direction and write one sentence explaining why it fits your customer. Use example numbers only until you have worked out your real costs.</p>`;
+<p>Your price also sends a message. A very low price can make people wonder about quality. Remember that price is not only what customers will pay. You must also cover your costs and have something left over. You will study that in Week 2 of Part 2. For now, choose a direction and write one sentence explaining why it fits your customer. Use example numbers only until you have worked out your real costs.</p>`;
 
 LESSONS.w5d3 = `<h4>PART 1 — Sole proprietor vs LLC in plain language</h4>
 <p>Every business has a legal form, sometimes called its <strong>structure</strong>. The structure decides who owns the business, who is responsible if something goes wrong, and how the business is set up with the government. Two common choices for a small food business are the sole proprietorship and the LLC.</p>
@@ -185,4 +185,4 @@ LESSONS.w5d4 = `<h4>PART 1 — What a business plan is for</h4>
 <li><strong>Step 5:</strong> Read it aloud. Mark any sentence that sounds unclear or untrue.</li>
 </ul>
 <p>Keep a short running list called "Questions to answer." Examples: "What does a permit cost here?" or "How many lunches can I make in an hour?" Each later lesson will help you answer some of them.</p>
-<p>At the end of Level II, you will put these sections together into your finished plan and submit it. Every bit of work you do now saves time later. Check your draft against the eight sections, and you are ready for the next week.</p>`;
+<p>At the end of Part 2, you will put these sections together into your finished plan and submit it. Every bit of work you do now saves time later. Check your draft against the eight sections, and you are ready for the next week.</p>`;

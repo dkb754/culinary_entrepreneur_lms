@@ -87,7 +87,7 @@ Your Access Code: ${code}
 
 Log in and Week 1 unlocks immediately. You go at your own pace.
 
-Four weeks of content covering kitchen systems, food safety, costing, menu planning, and what it actually takes to run a food business. Finish Level I and Level II opens automatically.
+Four weeks of content covering kitchen systems, food safety, costing, menu planning, and what it actually takes to run a food business. Finish Part 1 and Part 2 opens automatically.
 
 If you want to talk through your goals before you start — or at any point along the way — just reply to this email or call me directly.
 
@@ -116,7 +116,7 @@ Not interested? No problem — click here to opt out: ${unsubUrl}
 <p>🔗 <a href="${esc(PLATFORM_URL)}">${esc(PLATFORM_URL)}</a></p>
 <p>Your Name: <strong>${esc(name)}</strong><br>Your Access Code: <strong style="font-family:monospace;font-size:18px">${esc(code)}</strong></p>
 <p>Log in and Week 1 unlocks immediately. You go at your own pace.</p>
-<p>Four weeks of content covering kitchen systems, food safety, costing, menu planning, and what it actually takes to run a food business. Finish Level I and Level II opens automatically.</p>
+<p>Four weeks of content covering kitchen systems, food safety, costing, menu planning, and what it actually takes to run a food business. Finish Part 1 and Part 2 opens automatically.</p>
 <p>If you want to talk through your goals before you start — or at any point along the way — just reply to this email or call me directly.</p>
 <p>📞 (804) 219-8211</p>
 <p>As a Culinary Coach learner, you now have premium access to IBM SkillsBuild. IBM SkillsBuild is a professional learning platform with courses that pair with what you are building in CST. Some courses earn digital badges you can add to your resume. Register with the link below. This link connects you to the Culinary Coach partnership.</p>
