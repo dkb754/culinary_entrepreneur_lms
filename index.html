@@ -1197,6 +1197,186 @@ body {
 
 
 /* ============================================================
+   LEVEL HUB — four-level program map shown after login
+   ============================================================ */
+.level-hub { padding: 8px 0 32px; }
+.level-hub-header { margin-bottom: 32px; }
+.level-hub-header .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green-bright);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.level-hub-header h2 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  color: var(--green-dark);
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+.level-hub-header p { color: var(--gray-600); font-size: 14px; }
+
+.level-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.level-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.12s;
+  overflow: hidden;
+}
+.level-card.unlocked {
+  border-color: var(--green-mid);
+  cursor: pointer;
+}
+.level-card.unlocked:hover {
+  border-color: var(--green-bright);
+  box-shadow: 0 6px 24px rgba(26,58,42,0.14);
+  transform: translateY(-2px);
+}
+.level-card.unlocked:active { transform: translateY(0); }
+.level-card.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.level-card.current {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,168,67,0.18);
+}
+.level-card.current::before {
+  content: 'YOUR PROGRAM';
+  position: absolute;
+  top: 12px; right: 16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+}
+
+.level-icon {
+  width: 52px; height: 52px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.level-icon.green  { background: #e6f0ea; }
+.level-icon.gold   { background: #fdf3e3; }
+.level-icon.blue   { background: #e8f0ff; }
+.level-icon.orange { background: #fdeee8; }
+
+.level-info { flex: 1; min-width: 0; }
+.level-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gray-600);
+  margin-bottom: 3px;
+}
+.level-name {
+  font-family: var(--font-display);
+  font-size: 19px;
+  color: var(--green-dark);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.level-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+.level-tag.tag-async  { background: #e6f0ea; color: var(--green-mid); }
+.level-tag.tag-cohort { background: #fdf3e3; color: #8a6012; }
+.level-tag.tag-employ { background: #e8f0ff; color: #2a4db5; }
+.level-tag.tag-adv    { background: #fdeee8; color: #8a2a0a; }
+.level-desc {
+  font-size: 13px;
+  color: var(--gray-600);
+  line-height: 1.55;
+}
+.level-lock {
+  font-size: 22px;
+  color: var(--gray-600);
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+.level-arrow {
+  font-size: 20px;
+  color: var(--green-bright);
+  flex-shrink: 0;
+  margin-left: 4px;
+  transition: transform 0.15s;
+}
+.level-card.unlocked:hover .level-arrow { transform: translateX(4px); }
+
+.level-progress-bar {
+  height: 4px;
+  background: var(--gray-200);
+  border-radius: 2px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+.level-progress-fill {
+  height: 100%;
+  background: var(--green-bright);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.hub-ibm-note {
+  margin-top: 20px;
+  background: #eef4ff;
+  border: 1px solid #c5d8f8;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: #1a3a7a;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.hub-ibm-note .ibm-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+
+@media (max-width: 600px) {
+  .level-card { padding: 18px 16px; gap: 14px; }
+  .level-icon { width: 42px; height: 42px; font-size: 18px; }
+  .level-name { font-size: 16px; }
+}
+
+/* IBM SkillsBuild pages */
+.ibm-step { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 18px 22px; margin-bottom: 14px; }
+.ibm-step h3 { font-family: var(--font-display); font-size: 18px; color: var(--green-dark); margin-bottom: 6px; }
+.ibm-step p { color: var(--gray-600); font-size: 14px; margin-bottom: 10px; }
+.ibm-btn { display: inline-block; background: var(--green-mid); color: #fff; text-decoration: none; font-weight: 600; font-size: 14px; padding: 10px 18px; border-radius: 8px; }
+.ibm-btn:hover { background: var(--green-bright); }
+.ibm-courses { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.ibm-courses li { border: 1px solid var(--gray-200); border-radius: 10px; padding: 12px 16px; background: var(--white); }
+.ibm-courses li.pinned { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,168,67,0.18); }
+.ibm-courses a { font-weight: 600; color: var(--green-dark); }
+.ibm-courses .why { font-size: 13px; color: var(--gray-600); margin-top: 3px; line-height: 1.5; }
+.ibm-courses .pin-tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; color: #8a6012; margin-left: 8px; }
+.ibm-ai { background: #eef4ff; border-color: #c5d8f8 !important; }
+
+/* ============================================================
    ENHANCEMENTS — submissions, progress states, a11y, mobile
    ============================================================ */
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
@@ -1404,6 +1584,10 @@ body {
   <div class="app-layout">
     <aside class="sidebar" id="sidebar"></aside>
     <main class="main-content">
+      <div class="page-view" id="page-programs"></div>
+      <div class="page-view" id="page-ibm"></div>
+      <div class="page-view" id="page-prog-l3"></div>
+      <div class="page-view" id="page-prog-l4"></div>
       <div class="page-view active" id="page-dashboard"></div>
       <div class="page-view" id="page-w1"></div>
       <div class="page-view" id="page-w2"></div>
@@ -1451,6 +1635,7 @@ body {
   <span id="toast-msg">Saved!</span>
 </div>
 
+<script src="content/ibm-cohort.js"></script>
 <script src="content/level1.js"></script>
 <script src="content/level1-lessons.js"></script>
 <script src="content/level1-exercises.js"></script>
@@ -1682,7 +1867,9 @@ function itemDone(it) {
 // ============================================================
 function renderSidebar() {
   let h = `<div class="sidebar-section"><div class="sidebar-heading">Navigation</div>
-    <div class="sidebar-item active" data-page="dashboard" onclick="showPage('dashboard')"><div class="week-badge gold">⌂</div><span class="sidebar-item-label">Dashboard</span></div></div>`;
+    <div class="sidebar-item" data-page="programs" onclick="showPage('programs')"><div class="week-badge" style="background:var(--green-mid)">▦</div><span class="sidebar-item-label">All Programs</span></div>
+    <div class="sidebar-item active" data-page="dashboard" onclick="showPage('dashboard')"><div class="week-badge gold">⌂</div><span class="sidebar-item-label">Dashboard</span></div>
+    <div class="sidebar-item" data-page="ibm" onclick="showPage('ibm')"><div class="week-badge" style="background:#1f70c1">IBM</div><span class="sidebar-item-label">IBM SkillsBuild</span></div></div>`;
   LEVEL1.weeks.forEach(w => {
     h += `<div class="sidebar-section"><div class="sidebar-heading">Week ${w.n} · ${esc(w.dates)}</div>
       <div class="sidebar-item" data-page="w${w.n}" onclick="showPage('w${w.n}')" id="sb-w${w.n}">
@@ -1697,6 +1884,91 @@ function renderSidebar() {
     <div class="sidebar-item" data-page="rubric" onclick="showPage('rubric')"><div class="week-badge" style="background:#c4522a">📋</div><span class="sidebar-item-label">CST Rubric</span></div>
     <div class="sidebar-item" data-page="quizreview" onclick="showPage('quizreview')"><div class="week-badge" style="background:#c4522a">✔</div><span class="sidebar-item-label">Quiz Review</span></div></div>`;
   document.getElementById('sidebar').innerHTML = h;
+}
+
+// ============================================================
+// RENDER: program map (all four programs) and IBM SkillsBuild pages
+// ============================================================
+const PROGRAMS = [
+  { id: 'cst', name: 'Culinary Systems Training', tag: 'Self-Paced · Online', tagClass: 'tag-async', icon: '🍳', iconClass: 'green',
+    desc: 'The online starting point: kitchen systems, workplace habits, and food safety basics. You go at your own pace with your own access code.',
+    ibm: 'IBM SkillsBuild: Lifelong Professional Skills, Collaboration, and Job Readiness.', external: 'https://cst-async.netlify.app/' },
+  { id: 'ce1', name: 'Culinary Entrepreneurship I', tag: 'Cohort · Saturday Labs', tagClass: 'tag-cohort', icon: '📋', iconClass: 'gold', current: true,
+    desc: 'Four weeks of kitchen readiness, costing, menus, and your Concept Brief, with Saturday labs and the ServSafe Food Handler exam.',
+    ibm: 'IBM SkillsBuild Pathway 3 is open to you from Day 1, including the AI money tool.', page: 'dashboard' },
+  { id: 'l3', name: 'Frontline Supervisor Development', tag: 'Employer-Sponsored', tagClass: 'tag-employ', icon: '👥', iconClass: 'blue',
+    desc: 'Leading a team, kitchen communication, and shift management for working cooks and new supervisors. Ask Chef Duane about this program for your employer.',
+    ibm: 'IBM SkillsBuild Pathway 2, with Agile Explorer first.', page: 'prog-l3' },
+  { id: 'l4', name: 'Culinary Entrepreneurship II', tag: 'Cohort · Application & Launch', tagClass: 'tag-adv', icon: '🚀', iconClass: 'orange',
+    desc: 'Business planning, financial projections, and a live pitch for graduates of Culinary Entrepreneurship I, ending with a live pitch and an operating plan.',
+    ibm: 'IBM SkillsBuild: the same Pathway 3 courses, plus Agile Explorer and Data Driven Decision Making.', page: 'prog-l4' },
+];
+
+function renderPrograms() {
+  const cards = PROGRAMS.map(p => {
+    const open = p.external
+      ? `onclick="window.open('${esc(p.external)}','_blank','noopener')"`
+      : `onclick="showPage('${p.page}')"`;
+    const pct = p.current ? (document.getElementById('global-pct') || {}).textContent || '0%' : '';
+    return `<div class="level-card unlocked${p.current ? ' current' : ''}" ${open} role="button" tabindex="0" onkeydown="if(event.key==='Enter')this.click()">
+      <div class="level-icon ${p.iconClass}">${p.icon}</div>
+      <div class="level-info">
+        <div class="level-name">${esc(p.name)}</div>
+        <span class="level-tag ${p.tagClass}">${esc(p.tag)}</span>
+        <div class="level-desc">${esc(p.desc)}</div>
+        <div class="level-desc" style="margin-top:6px;color:#1a3a7a">${esc(p.ibm)}</div>
+        ${p.current ? `<div class="level-progress-bar" title="Your progress ${esc(pct)}"><div class="level-progress-fill" style="width:${esc(pct)}"></div></div>` : ''}
+      </div>
+      <div class="level-arrow">${p.external ? '↗' : '›'}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('page-programs').innerHTML = `
+    <div class="level-hub">
+      <div class="level-hub-header">
+        <div class="eyebrow">Culinary Coach LLC</div>
+        <h2 id="hub-greeting">Welcome back${currentUser ? ', ' + esc(currentUser.split(' ')[0]) : ''}!</h2>
+        <p>These are the Culinary Coach programs. Yours is marked. Open it to see your weeks, quizzes, and labs.</p>
+      </div>
+      <div class="level-cards">${cards}</div>
+      <div class="hub-ibm-note"><div class="ibm-icon">🎓</div>
+        <div><strong>IBM SkillsBuild</strong> is part of your enrollment. You have premium access to IBM courses that match what you are learning, and some of them earn digital badges for your resume. <button class="link-btn" onclick="showPage('ibm')">Open IBM SkillsBuild</button></div></div>
+    </div>`;
+}
+
+function ibmCourseList(list) {
+  return `<ul class="ibm-courses">${list.map(c => `<li class="${c.pinned ? 'pinned' : ''}${c.ai ? ' ibm-ai' : ''}">
+      <a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.title)}</a>${c.pinned ? '<span class="pin-tag">START HERE</span>' : ''}
+      <div class="why">${esc(c.why)}</div></li>`).join('')}</ul>`;
+}
+function ibmRegisterStep() {
+  const r = window.IBM_COHORT.register;
+  return `<div class="ibm-step"><h3>Step 1: Register</h3>
+    <p>Register first. Use this link so your account is connected to Culinary Coach.</p>
+    <a class="ibm-btn" href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a></div>`;
+}
+function renderIbm() {
+  document.getElementById('page-ibm').innerHTML = `
+    <div class="dash-header"><div class="eyebrow">Culinary Coach LLC</div><h2>IBM SkillsBuild</h2>
+      <p>As a Culinary Coach learner, you have premium access to IBM SkillsBuild. These courses go with what you are learning here. All of them are self-paced, and some earn digital badges you can add to your resume.</p></div>
+    ${ibmRegisterStep()}
+    <div class="ibm-step"><h3>Step 2: Pick a course</h3>
+      <p>These courses fit Culinary Entrepreneurship. Start with any one.</p>
+      ${ibmCourseList(window.IBM_COHORT.pathway3)}</div>`;
+}
+function renderProgramPage(id) {
+  const D = window.IBM_COHORT;
+  const isL3 = id === 'prog-l3';
+  const p = PROGRAMS.find(x => x.page === id);
+  const list = isL3 ? D.pathway2 : D.pathway3.concat(D.level4Extra.filter(e => !D.pathway3.some(x => x.title === e.title)));
+  document.getElementById('page-' + id).innerHTML = `
+    <div class="dash-header">
+      <div style="margin-bottom:12px"><button class="link-btn" onclick="showPage('programs')">‹ All Programs</button></div>
+      <div class="eyebrow">${esc(p.tag)}</div><h2>${esc(p.name)}</h2><p>${esc(p.desc)}</p></div>
+    ${ibmRegisterStep()}
+    <div class="ibm-step"><h3>Step 2: IBM SkillsBuild courses</h3>
+      <p>${isL3 ? 'Start with Agile Explorer. It earns an IBM SkillsBuild digital credential.' : 'Pick up where Culinary Entrepreneurship I left off. These are the same courses, plus two for planning and money.'}</p>
+      ${ibmCourseList(list)}</div>
+    <p style="font-size:13px;color:var(--gray-600)">${isL3 ? 'Lessons for this program are not in this site yet. Contact Chef Duane to set it up for your team.' : 'Lessons for this program open after you finish Culinary Entrepreneurship I. Contact Chef Duane with questions.'}</p>`;
 }
 
 function renderDashboard() {
@@ -1931,6 +2203,9 @@ function showPage(id) {
   if (id === 'quizreview') buildQuizReview();
   if (id === 'my-grades') buildMyGrades();
   if (id === 'krp') renderKrpItems();
+  if (id === 'programs') renderPrograms();
+  if (id === 'ibm') renderIbm();
+  if (id === 'prog-l3' || id === 'prog-l4') renderProgramPage(id);
   updateProgress();
 }
 
@@ -2727,7 +3002,7 @@ async function launchApp() {
   document.getElementById('dash-greeting').textContent = 'Welcome back, ' + currentUser.split(' ')[0] + '!';
   document.getElementById('admin-nav').style.display = isAdmin ? 'block' : 'none';
   buildAllQuizzes();
-  showPage('dashboard');
+  showPage('programs');
 }
 
 function doLogout() {

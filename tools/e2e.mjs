@@ -323,7 +323,26 @@ R.section('Login, page hygiene and student view');
   const body = await page.evaluate(() => document.body.innerText + document.body.textContent);
   ok(/Oct 12/.test(await page.content()), 'cohort dates present');
   ok(!/April|Spring 2026|Easter|ZZ_LMS/.test(body), 'no leftover Spring-cohort text');
-  ok(/level i/i.test(await text(page, '.dash-header')), 'dashboard says Level I');
+  // ---- program map + IBM SkillsBuild (cohort)
+  await page.evaluate(() => showPage('programs'));
+  const hub = await text(page, '#page-programs');
+  ok(await page.locator('#page-programs.active').count() === 1 && await page.locator('#page-programs .level-card').count() === 4, 'the program map lists four programs');
+  ok(/Culinary Systems Training/.test(hub) && /Culinary Entrepreneurship I\b/.test(hub) && /Frontline Supervisor Development/.test(hub) && /Culinary Entrepreneurship II/.test(hub), 'the four programs are named');
+  ok(await page.locator('#page-programs .level-card.current').count() === 1 && /Culinary Entrepreneurship I\b(?! ?I)/.test(await text(page, '#page-programs .level-card.current')), 'the learner\'s own program is marked');
+  await page.evaluate(() => showPage('ibm'));
+  const ibm = await page.locator('#page-ibm a').evaluateAll(as => as.map(a => ({ t: a.textContent.trim(), h: a.href, tg: a.target })));
+  ok(ibm.length === 12 && ibm[0].t === 'Register for IBM SkillsBuild' && ibm[0].h === 'https://skills.yourlearning.ibm.com/?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach', 'IBM SkillsBuild: the registration link first, then 11 courses', JSON.stringify(ibm.map(l => l.t)));
+  ok(['Be an Entrepreneur', 'Entrepreneur Mindset', 'Project Management Fundamentals', 'How Smart Is Your Spending?', 'Sales Strategy', 'Digital Marketing', 'The Marketing Funnel', 'Operations Management', 'Digital Literacy', 'AI Literacy', 'Excel Training'].every((t, i) => ibm[i + 1].t === t), 'the 11 Pathway 3 courses are listed in order');
+  ok(ibm.every(l => l.tg === '_blank' && /^https:\/\/skills\.yourlearning\.ibm\.com\/((activity|channel)\/[\w-]+)?\?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach$/.test(l.h)), 'every IBM link opens in a new tab with the full tracking string')
+  ok(/use AI to track your money/.test(await text(page, '#page-ibm')) && /digital badge/.test(await text(page, '#page-ibm')), 'the AI money course has its plain-language blurb');
+  ok(!/\bfree\b/i.test(await text(page, '#page-ibm') + await text(page, '#sidebar')), 'the IBM SkillsBuild page never says "free"');
+  await page.evaluate(() => showPage('prog-l3'));
+  const l3 = await page.locator('#page-prog-l3 .ibm-courses a').evaluateAll(as => as.map(a => a.textContent.trim()));
+  ok(l3[0] === 'Agile Explorer' && l3.length === 8 && /START HERE/.test(await text(page, '#page-prog-l3 .ibm-courses li')), 'Frontline Supervisor: Agile Explorer is pinned first, then the other Pathway 2 courses', JSON.stringify(l3));
+  await page.evaluate(() => showPage('prog-l4'));
+  ok(await page.locator('#page-prog-l4 .ibm-courses a').count() === 13 && /Data Driven Decision Making/.test(await text(page, '#page-prog-l4')), 'Culinary Entrepreneurship II lists Pathway 3 plus Agile Explorer and Data Driven Decision Making');
+  await page.evaluate(() => showPage('dashboard'));
+  ok(/level i/i.test(await text(page, '#page-dashboard .dash-header')), 'dashboard says Level I');
   ok(!/VCU/i.test(await page.content()) && !/VCU/i.test(body), 'no VCU references anywhere on the page');
   ok(!/cognitive load|stressors|incivility|anticipated|facilitate the/i.test(await page.evaluate(() => document.body.textContent)), 'no hard-word jargon (cognitive load, stressors, incivility…) in the student UI');
   ok(!/Stress Recognition|Cognitive Reframing|Social Support|Self-Regulation|skill cluster/i.test(await page.evaluate(() => document.body.textContent)), 'no clinical KRP labels anywhere in the student UI');
