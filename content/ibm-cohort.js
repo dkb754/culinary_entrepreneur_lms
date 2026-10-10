@@ -8,8 +8,9 @@
   const c = (title, path, why, extra) => Object.assign({ title, url: B + path + Q, why }, extra || {});
   window.IBM_COHORT = {
     register: { title: 'Register for IBM SkillsBuild', url: B + Q },
-    // Pathway 3: Culinary Entrepreneurship (shown from Day 1 in this LMS)
-    pathway3: [
+    // Level 2: Culinary Entrepreneurship I (shown from Day 1 in this LMS).
+    // Levels 3 and 4 are paid and locked: their IBM links are NOT shipped in this file until those levels can be unlocked.
+    level2: [
       c('Be an Entrepreneur', 'activity/PLAN-531AD0928A0D', 'Learn what it takes to start a business and how to plan one that can work.'),
       c('Entrepreneur Mindset', 'channel/CNL_LCB_1591120143256', 'Build the habits and thinking that help business owners keep going.'),
       c('Project Management Fundamentals', 'activity/PLAN-B2DE5C927EEC', 'Learn to plan and organize the work it takes to open and run your business.'),
@@ -23,22 +24,6 @@
       c('Digital Literacy', 'activity/PLAN-6B6FDF811C80', 'Get comfortable with the digital tools every business uses.'),
       c('AI Literacy', 'activity/PLAN-1C903152880C', 'Learn what AI is and how it can help a small business.'),
       c('Excel Training', 'activity/URL-829FEB19E9BA', 'Learn spreadsheet skills for organizing and tracking your numbers.'),
-    ],
-    // Pathway 2: Frontline Supervisor Development (Agile Explorer is pinned first)
-    pathway2: [
-      c('Agile Explorer', 'activity/PLAN-716FDF294AB3', 'Learn Agile ways of working to improve teamwork and handle change. You earn an IBM SkillsBuild digital credential.', { pinned: true }),
-      c('Leadership Skills', 'activity/PLAN-DA092DF5FEDD', 'Build decision-making, teamwork, and people-leadership skills.'),
-      c('Customer Service', 'activity/PLAN-B8A361A0B47A', 'Practice communication, problem-solving, and good service in person and online.'),
-      c('Project Management Fundamentals', 'activity/PLAN-B2DE5C927EEC', 'Plan and organize work, make decisions, and solve problems with your team.'),
-      c('Excel Training', 'activity/URL-829FEB19E9BA', 'Organize, track, and study workplace numbers in a spreadsheet.'),
-      c('Data Driven Decision Making', 'activity/ALM-COURSE_4058990', 'Use facts and numbers to make better choices at work.'),
-      c('Data Literacy', 'activity/PLAN-6B6FDF811C80', 'Learn to read and question data so you can make smart choices.'),
-      c('AI Literacy', 'activity/PLAN-1C903152880C', 'Learn what AI is and how it can help at work.'),
-    ],
-    // Culinary Entrepreneurship II: the same set, with two courses for the planning and money chapters
-    level4Extra: [
-      c('Agile Explorer', 'activity/PLAN-716FDF294AB3', 'Use Agile steps to plan how your business will run day to day.'),
-      c('Data Driven Decision Making', 'activity/ALM-COURSE_4058990', 'Use numbers to build and check your financial projections.'),
     ],
   };
 })();
