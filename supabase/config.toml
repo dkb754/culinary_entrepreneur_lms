@@ -21,5 +21,8 @@ verify_jwt = false
 [functions.cst-async-api]
 verify_jwt = false
 
+[functions.cst-enrollment]
+verify_jwt = false
+
 [functions.send-checkins]
 verify_jwt = false
