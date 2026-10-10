@@ -65,6 +65,8 @@ await t('create', async () => {
   const IBM = 'https://skills.yourlearning.ibm.com/?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach';
   ok(a.text.includes(IBM) && a.html.includes('Register for IBM SkillsBuild') && a.html.includes(IBM.replace(/&/g, '&amp;')), 'learner e-mail carries the IBM SkillsBuild block and registration link');
   ok(a.text.indexOf('IBM SkillsBuild') < a.text.indexOf('Chef Duane Brown\nCulinary Coach LLC'), 'the IBM block comes before the sign-off');
+  const CQ = '?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach';
+  ok(['activity/PLAN-8AF5B141EC32', 'channel/CNL_LCB_1568648534810', 'activity/PLAN-B1632133A641'].every(c => a.text.includes('https://skills.yourlearning.ibm.com/' + c + CQ) && a.html.includes('href="https://skills.yourlearning.ibm.com/' + c + CQ.replace(/&/g, '&amp;') + '"')), 'each IBM course in the e-mail is a live link carrying the full tracking string');
   ok(!/\bfree\b/i.test(a.subject + a.text + a.html), 'learner e-mail never uses the word "free"');
   ok(!n.text.includes('IBM'), 'Duane\'s notice has no IBM block');
   ok(!a.text.includes('INSERT') && !a.text.includes('[Name]') && !a.text.includes('[Generated'), 'no template placeholders are left in the e-mail');

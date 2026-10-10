@@ -61,6 +61,12 @@ async function sendMail(payload: Record<string, unknown>): Promise<"sent" | "fai
   } catch (e) { console.error("resend fetch failed", String(e)); return "failed"; }
 }
 
+const IBM_Q = "?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach";
+const IBM_COURSES = [
+  ["Lifelong Professional Skills", "https://skills.yourlearning.ibm.com/activity/PLAN-8AF5B141EC32" + IBM_Q],
+  ["Collaboration", "https://skills.yourlearning.ibm.com/channel/CNL_LCB_1568648534810" + IBM_Q],
+  ["Job Readiness", "https://skills.yourlearning.ibm.com/activity/PLAN-B1632133A641" + IBM_Q],
+];
 const IBM_URL = "https://skills.yourlearning.ibm.com/?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach";
 
 function applicantEmail(name: string, code: string, unsubUrl: string) {
@@ -93,6 +99,8 @@ Register for IBM SkillsBuild: ${IBM_URL}
 
 Once registered, start with Lifelong Professional Skills, Collaboration, or Job Readiness. All courses are self-paced.
 
+${IBM_COURSES.map(([n, u]) => `${n}: ${u}`).join("\n")}
+
 Chef Duane Brown
 Culinary Coach LLC
 culinarycoach.org
@@ -113,7 +121,7 @@ Not interested? No problem — click here to opt out: ${unsubUrl}
 <p>📞 (804) 219-8211</p>
 <p>As a Culinary Coach learner, you now have premium access to IBM SkillsBuild. IBM SkillsBuild is a professional learning platform with courses that pair with what you are building in CST. Some courses earn digital badges you can add to your resume. Register with the link below. This link connects you to the Culinary Coach partnership.</p>
 <p><a href="${esc(IBM_URL)}">Register for IBM SkillsBuild</a></p>
-<p>Once registered, start with Lifelong Professional Skills, Collaboration, or Job Readiness. All courses are self-paced.</p>
+<p>Once registered, start with ${IBM_COURSES.map(([n, u]) => `<a href="${esc(u)}">${esc(n)}</a>`).join(", ")}. All courses are self-paced.</p>
 <p>Chef Duane Brown<br>Culinary Coach LLC<br>culinarycoach.org</p>
 <hr style="border:none;border-top:1px solid #ddd">
 <p style="font-size:13px;color:#666">Not interested? No problem — <a href="${esc(unsubUrl)}">click here to opt out</a>.</p>
