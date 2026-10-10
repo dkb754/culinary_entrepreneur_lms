@@ -16,7 +16,7 @@ for f in sorted((root / "content").glob("*.js")):  # curriculum resources live i
     t = f.read_text()
     urls |= set(re.findall(r"url:\s*'(https?://[^']+)'", t))
     urls |= {"https://www.youtube.com/watch?v=" + i for i in re.findall(r"YT\('([\w-]{11})'\)", t)}
-# The 15 CareerCircle IBM SkillsBuild links (registration + Pathway 1 + Pathway 3). Checked on every branch whether or not that
+# The CareerCircle IBM SkillsBuild links (registration + Pathways 1, 2 and 3). Checked on every branch whether or not that
 # product shows them. SkillsBuild sends most links to its sign-in page, so HTTP 200 or 302 both pass (redirects are not followed).
 _Q = "?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach"
 _B = "https://skills.yourlearning.ibm.com/"
@@ -24,8 +24,10 @@ IBM_URLS = [_B + _Q] + [_B + p + _Q for p in (
     "activity/PLAN-8AF5B141EC32", "channel/CNL_LCB_1568648534810", "activity/PLAN-B1632133A641",
     "activity/PLAN-531AD0928A0D", "channel/CNL_LCB_1591120143256", "activity/PLAN-B2DE5C927EEC", "activity/ALM-COURSE_4082738",
     "activity/PLAN-E395160BCA49", "activity/PLAN-967AE6EBC864", "activity/ALM-COURSE_4074183", "activity/URL-DF4DD5E8922A",
-    "activity/PLAN-6B6FDF811C80", "activity/PLAN-1C903152880C", "activity/URL-829FEB19E9BA")]
-assert len(IBM_URLS) == 15
+    "activity/PLAN-6B6FDF811C80", "activity/PLAN-1C903152880C", "activity/URL-829FEB19E9BA",
+    # Pathway 2 (Frontline Supervisor Development) and Data Driven Decision Making
+    "activity/PLAN-716FDF294AB3", "activity/PLAN-DA092DF5FEDD", "activity/PLAN-B8A361A0B47A", "activity/ALM-COURSE_4058990")]
+assert len(IBM_URLS) == 19
 urls |= set(IBM_URLS)
 urls = sorted(urls - {"https://fonts.googleapis.com"})
 urls = [u.replace("&amp;", "&") for u in urls if "fonts.googleapis" not in u]
