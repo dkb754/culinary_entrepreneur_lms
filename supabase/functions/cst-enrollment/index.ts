@@ -2,7 +2,7 @@
 //   -> { success: true, code: "CST-2026-X7K2M9" }   (a repeat or opted-out e-mail returns { success: true } with no code and no e-mail)
 // GET  /functions/v1/cst-enrollment?u=<token>      one-click unsubscribe (also accepts POST for e-mail clients' List-Unsubscribe-Post)
 //
-// Creates a free self-paced CST access code, stores it hashed (like every other code), then sends two e-mails in parallel
+// Creates a self-paced CST access code, stores it hashed (like every other code), then sends two e-mails in parallel
 // through Resend: the applicant's welcome e-mail and a notice to Duane. It touches only student_access_codes rows with
 // level 'cst-async' (through the cst_enroll SQL function); lms-api-v2, validate-login, student_progress and cohort data are not used.
 //
@@ -61,14 +61,22 @@ async function sendMail(payload: Record<string, unknown>): Promise<"sent" | "fai
   } catch (e) { console.error("resend fetch failed", String(e)); return "failed"; }
 }
 
+const IBM_Q = "?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach";
+const IBM_COURSES = [
+  ["Lifelong Professional Skills", "https://skills.yourlearning.ibm.com/activity/PLAN-8AF5B141EC32" + IBM_Q],
+  ["Collaboration", "https://skills.yourlearning.ibm.com/channel/CNL_LCB_1568648534810" + IBM_Q],
+  ["Job Readiness", "https://skills.yourlearning.ibm.com/activity/PLAN-B1632133A641" + IBM_Q],
+];
+const IBM_URL = "https://skills.yourlearning.ibm.com/?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach";
+
 function applicantEmail(name: string, code: string, unsubUrl: string) {
   const first = name.split(" ")[0];
-  const subject = "Your Free Access to Culinary Systems Training — From Chef Duane";
+  const subject = "Your Premium Access to Culinary Systems Training — From Chef Duane";
   const text = `Hi ${first},
 
 You reached out and I want to make sure you leave with something useful.
 
-I'm opening up free access to Culinary Systems Training — the same curriculum I use with my paid cohorts — so you can see exactly what we do and decide if it's right for you.
+I'm opening up premium access to Culinary Systems Training — the same curriculum I use with my paid cohorts — so you can see exactly what we do and decide if it's right for you.
 
 No cost. No commitment. Start whenever you're ready.
 
@@ -85,6 +93,14 @@ If you want to talk through your goals before you start — or at any point alon
 
 📞 (804) 219-8211
 
+As a Culinary Coach learner, you now have premium access to IBM SkillsBuild. IBM SkillsBuild is a professional learning platform with courses that pair with what you are building in CST. Some courses earn digital badges you can add to your resume. Register with the link below. This link connects you to the Culinary Coach partnership.
+
+Register for IBM SkillsBuild: ${IBM_URL}
+
+Once registered, start with Lifelong Professional Skills, Collaboration, or Job Readiness. All courses are self-paced.
+
+${IBM_COURSES.map(([n, u]) => `${n}: ${u}`).join("\n")}
+
 Chef Duane Brown
 Culinary Coach LLC
 culinarycoach.org
@@ -95,7 +111,7 @@ Not interested? No problem — click here to opt out: ${unsubUrl}
   const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.5;color:#222;max-width:600px">
 <p>Hi ${esc(first)},</p>
 <p>You reached out and I want to make sure you leave with something useful.</p>
-<p>I'm opening up free access to Culinary Systems Training — the same curriculum I use with my paid cohorts — so you can see exactly what we do and decide if it's right for you.</p>
+<p>I'm opening up premium access to Culinary Systems Training — the same curriculum I use with my paid cohorts — so you can see exactly what we do and decide if it's right for you.</p>
 <p>No cost. No commitment. Start whenever you're ready.</p>
 <p>🔗 <a href="${esc(PLATFORM_URL)}">${esc(PLATFORM_URL)}</a></p>
 <p>Your Name: <strong>${esc(name)}</strong><br>Your Access Code: <strong style="font-family:monospace;font-size:18px">${esc(code)}</strong></p>
@@ -103,6 +119,9 @@ Not interested? No problem — click here to opt out: ${unsubUrl}
 <p>Four weeks of content covering kitchen systems, food safety, costing, menu planning, and what it actually takes to run a food business. Finish Level I and Level II opens automatically.</p>
 <p>If you want to talk through your goals before you start — or at any point along the way — just reply to this email or call me directly.</p>
 <p>📞 (804) 219-8211</p>
+<p>As a Culinary Coach learner, you now have premium access to IBM SkillsBuild. IBM SkillsBuild is a professional learning platform with courses that pair with what you are building in CST. Some courses earn digital badges you can add to your resume. Register with the link below. This link connects you to the Culinary Coach partnership.</p>
+<p><a href="${esc(IBM_URL)}">Register for IBM SkillsBuild</a></p>
+<p>Once registered, start with ${IBM_COURSES.map(([n, u]) => `<a href="${esc(u)}">${esc(n)}</a>`).join(", ")}. All courses are self-paced.</p>
 <p>Chef Duane Brown<br>Culinary Coach LLC<br>culinarycoach.org</p>
 <hr style="border:none;border-top:1px solid #ddd">
 <p style="font-size:13px;color:#666">Not interested? No problem — <a href="${esc(unsubUrl)}">click here to opt out</a>.</p>

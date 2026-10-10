@@ -16,6 +16,17 @@ for f in sorted((root / "content").glob("*.js")):  # curriculum resources live i
     t = f.read_text()
     urls |= set(re.findall(r"url:\s*'(https?://[^']+)'", t))
     urls |= {"https://www.youtube.com/watch?v=" + i for i in re.findall(r"YT\('([\w-]{11})'\)", t)}
+# The 15 CareerCircle IBM SkillsBuild links (registration + Pathway 1 + Pathway 3). Checked on every branch whether or not that
+# product shows them. SkillsBuild sends most links to its sign-in page, so HTTP 200 or 302 both pass (redirects are not followed).
+_Q = "?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach"
+_B = "https://skills.yourlearning.ibm.com/"
+IBM_URLS = [_B + _Q] + [_B + p + _Q for p in (
+    "activity/PLAN-8AF5B141EC32", "channel/CNL_LCB_1568648534810", "activity/PLAN-B1632133A641",
+    "activity/PLAN-531AD0928A0D", "channel/CNL_LCB_1591120143256", "activity/PLAN-B2DE5C927EEC", "activity/ALM-COURSE_4082738",
+    "activity/PLAN-E395160BCA49", "activity/PLAN-967AE6EBC864", "activity/ALM-COURSE_4074183", "activity/URL-DF4DD5E8922A",
+    "activity/PLAN-6B6FDF811C80", "activity/PLAN-1C903152880C", "activity/URL-829FEB19E9BA")]
+assert len(IBM_URLS) == 15
+urls |= set(IBM_URLS)
 urls = sorted(urls - {"https://fonts.googleapis.com"})
 urls = [u.replace("&amp;", "&") for u in urls if "fonts.googleapis" not in u]
 UA = {
@@ -27,7 +38,19 @@ UA = {
 # A failure here is reported as WARN: open the link in a browser to confirm.
 BOT_BLOCKS_SCRIPTS = ("fda.gov",)
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *a, **k):
+        return None
+
 def get(url, method="GET"):
+    if urllib.parse.urlparse(url).hostname == "skills.yourlearning.ibm.com":
+        try:
+            with urllib.request.build_opener(_NoRedirect).open(urllib.request.Request(url, headers=UA, method=method), timeout=25) as r:
+                return r.status, r.geturl()
+        except urllib.error.HTTPError as e:
+            if e.code == 302:
+                return 302, url
+            raise
     req = urllib.request.Request(url, headers=UA, method=method)
     with urllib.request.urlopen(req, timeout=25) as r:
         return r.status, r.geturl()

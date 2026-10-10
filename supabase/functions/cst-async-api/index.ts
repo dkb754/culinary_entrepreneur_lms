@@ -105,6 +105,7 @@ const toProgress = (r: Row | null | undefined) => {
   return {
     quizzes: q, deliverables: row.deliverables || {}, krp_portfolio: row.krp_portfolio || {}, exercises: row.exercises || {},
     unlocked_weeks: weeks, ready_l2: readyForL2(row),
+    module_2_complete: passedAll(q, WEEK_QUIZZES[2]),   // opens the IBM SkillsBuild section (Week 2 = Module 2)
     l1_done: passedAll(q, L1_QUIZ_IDS), unlock_through: row.unlock_through || 0,
     checkin: { opt_in: !!row.checkin_opt_in, email: row.checkin_email || "", sent: !!row.checkin_sent_at },
   };
@@ -197,7 +198,7 @@ Deno.serve(async (req) => {
       case "load": {
         const published = await getPublished();
         if (isAdmin) {
-          const p = toProgress(null); p.unlocked_weeks = [1, 2, 3, 4, 5, 6, 7, 8]; // instructor preview: everything readable
+          const p = toProgress(null); p.unlocked_weeks = [1, 2, 3, 4, 5, 6, 7, 8]; p.module_2_complete = true; // instructor preview: everything readable
           return json(200, { progress: p, is_admin: true, settings: { published_quizzes: published } });
         }
         const row = await ensureRow(user);

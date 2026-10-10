@@ -52,7 +52,7 @@ await t('create', async () => {
   ok(!!a && !!n, 'one e-mail went to the applicant and one to Duane');
   ok(a.auth === 'Bearer ci-test-key', 'the Resend API key is sent as a bearer token');
   eq(a.from, 'Chef Duane Brown <duane@culinarycoach.org>', 'applicant e-mail is from Chef Duane Brown');
-  eq(a.subject, 'Your Free Access to Culinary Systems Training — From Chef Duane', 'applicant subject matches the brief');
+  eq(a.subject, 'Your Premium Access to Culinary Systems Training — From Chef Duane', 'applicant subject says premium access');
   ok(a.text.includes('Hi Maya,') && a.text.includes('Your Name: Maya Brooks') && a.text.includes(`Your Access Code: ${r.body.code}`), 'applicant e-mail has the name and the access code');
   ok(a.text.includes('https://cst-async.netlify.app/') && a.text.includes('(804) 219-8211') && a.text.includes('Week 1 unlocks immediately'), 'applicant e-mail has the platform link, phone number and Week 1 line');
   ok(a.html.includes(r.body.code) && a.reply_to === 'duane@culinarycoach.org', 'HTML version carries the code, and replies go to Duane');
@@ -62,6 +62,13 @@ await t('create', async () => {
   eq(n.from, 'noreply@culinarycoach.org', 'Duane\'s notice is from noreply@culinarycoach.org');
   eq(n.subject, 'New CST Enrollment — Maya Brooks', 'Duane\'s notice subject names the applicant');
   ok(['Name: Maya Brooks', 'Email: maya.brooks@example.com', 'Source: culinarycoach.org', `Code issued: ${r.body.code}`, 'Time: '].every(l => n.text.includes(l)), 'Duane\'s notice lists name, e-mail, source, code and time');
+  const IBM = 'https://skills.yourlearning.ibm.com/?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach';
+  ok(a.text.includes(IBM) && a.html.includes('Register for IBM SkillsBuild') && a.html.includes(IBM.replace(/&/g, '&amp;')), 'learner e-mail carries the IBM SkillsBuild block and registration link');
+  ok(a.text.indexOf('IBM SkillsBuild') < a.text.indexOf('Chef Duane Brown\nCulinary Coach LLC'), 'the IBM block comes before the sign-off');
+  const CQ = '?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach';
+  ok(['activity/PLAN-8AF5B141EC32', 'channel/CNL_LCB_1568648534810', 'activity/PLAN-B1632133A641'].every(c => a.text.includes('https://skills.yourlearning.ibm.com/' + c + CQ) && a.html.includes('href="https://skills.yourlearning.ibm.com/' + c + CQ.replace(/&/g, '&amp;') + '"')), 'each IBM course in the e-mail is a live link carrying the full tracking string');
+  ok(!/\bfree\b/i.test(a.subject + a.text + a.html), 'learner e-mail never uses the word "free"');
+  ok(!n.text.includes('IBM'), 'Duane\'s notice has no IBM block');
   ok(!a.text.includes('INSERT') && !a.text.includes('[Name]') && !a.text.includes('[Generated'), 'no template placeholders are left in the e-mail');
 });
 

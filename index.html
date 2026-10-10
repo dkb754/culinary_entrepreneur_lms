@@ -1277,6 +1277,7 @@ body {
       <div class="page-view" id="page-w7"></div>
       <div class="page-view" id="page-w8"></div>
       <div class="page-view" id="page-krp"></div>
+      <div class="page-view" id="page-ibm"></div>
       <div class="page-view" id="page-my-grades">
         <div class="week-header"><div class="wh-eyebrow">My Progress</div><h2>My Grades &amp; Submissions</h2></div>
         <div class="table-scroll">
@@ -1324,6 +1325,7 @@ body {
   <span id="toast-msg">Saved!</span>
 </div>
 
+<script src="content/ibm-skillsbuild.js"></script>
 <script src="content/level1.js"></script>
 <script src="content/cst-level2.js"></script>
 <script src="content/level1-lessons.js"></script>
@@ -1387,7 +1389,7 @@ let syncStatus = 'idle'; // idle | saving | saved | error
 let unsynced = false;     // true while the latest change exists only on this device
 
 function EMPTY() {
-  return { quizzes: {}, deliverables: {}, krp_portfolio: {}, exercises: {}, unlocked_weeks: [1], ready_l2: false, l1_done: false, unlock_through: 0, checkin: { opt_in: false, email: '', sent: false } };
+  return { quizzes: {}, deliverables: {}, krp_portfolio: {}, exercises: {}, unlocked_weeks: [1], ready_l2: false, module_2_complete: false, l1_done: false, unlock_through: 0, checkin: { opt_in: false, email: '', sent: false } };
 }
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -1574,6 +1576,7 @@ function renderSidebar() {
         <span class="sidebar-item-label">${esc(w.side)}</span><span class="sidebar-check" id="sb-w${w.n}-check"></span></div></div>`;
   });
   h += `<div class="sidebar-section"><div class="sidebar-heading">My Progress</div>
+    <div class="sidebar-item" data-page="ibm" id="sb-ibm" onclick="showPage('ibm')" style="display:none"><div class="week-badge" style="background:#1f70c1">IBM</div><span class="sidebar-item-label">IBM SkillsBuild</span></div>
     <div class="sidebar-item" data-page="krp" onclick="showPage('krp')"><div class="week-badge" style="background:var(--green-mid)">K</div><span class="sidebar-item-label">KRP Portfolio</span></div>
     <div class="sidebar-item" data-page="my-grades" onclick="showPage('my-grades')"><div class="week-badge" style="background:#6b6558">📊</div><span class="sidebar-item-label">My Grades &amp; Submissions</span></div></div>
     <div class="sidebar-section" id="admin-nav" style="display:none"><div class="sidebar-heading">Instructor</div>
@@ -1592,6 +1595,7 @@ function renderDashboard() {
     <div class="dash-header"><div class="eyebrow">Culinary Coach LLC</div><h2 id="dash-greeting">Welcome back!</h2>
       <p>Work at your own pace, online. Pass every quiz in a week (70% or higher) to open the next week. You are on <strong id="cur-week">Week 1</strong>.</p></div>
     <div class="l2-banner" id="l2-banner" style="display:none">🎓 <div><strong>You're ready for Level II.</strong> You passed every Level I quiz and submitted your Concept Brief. Level II (business planning) is open now. <button class="link-btn" onclick="showPage('w5')">Start Level II</button></div></div>
+    <div class="l2-banner" id="ibm-banner" style="display:none">🎖️ <div><strong>You have earned premium access to IBM SkillsBuild.</strong> Register with the link on the IBM SkillsBuild page, then start your first course. <button class="link-btn" onclick="showPage('ibm')">Open IBM SkillsBuild</button></div></div>
     <div class="stats-row">
       <div class="stat-card"><div class="stat-value" id="stat-week">1</div><div class="stat-label">Current Week</div></div>
       <div class="stat-card"><div class="stat-value" id="stat-quizzes">0</div><div class="stat-label">Quizzes Passed</div></div>
@@ -1740,6 +1744,39 @@ function gateMessage(n) {
   return `${esc(weekLabel(n))} opens when you pass every quiz in ${esc(weekLabel(n - 1))} (70% or higher).`;
 }
 
+// ---- IBM SkillsBuild: opens when the server says Module 2 (Week 2) quizzes are all passed. Hidden until then.
+const ibmUnlocked = () => !!memCache.module_2_complete || isAdmin;
+function ibmLink(c) { return `<li><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.title)}</a></li>`; }
+function renderIbm() {
+  const D = window.IBM_SKILLSBUILD;
+  document.getElementById('page-ibm').innerHTML = `
+    <div class="dash-header"><div class="eyebrow">Culinary Coach LLC</div><h2>IBM SkillsBuild</h2>
+      <p>You have earned premium access to IBM SkillsBuild as a Culinary Coach learner. IBM SkillsBuild is a learning site with courses that go with what you are building here. Some courses give you a digital badge to put on your resume.</p></div>
+    <div style="background:#fff;border:1px solid #e3ddd0;border-radius:10px;padding:18px 20px;margin-bottom:16px"><h3 style="margin-bottom:8px">Step 1: Register</h3>
+      <p style="margin-bottom:12px">Register first. Use this link so your account is connected to Culinary Coach.</p>
+      <a class="btn-submit-work" style="display:inline-block;text-decoration:none" href="${esc(D.register.url)}" target="_blank" rel="noopener">${esc(D.register.title)}</a></div>
+    <div style="background:#fff;border:1px solid #e3ddd0;border-radius:10px;padding:18px 20px"><h3 style="margin-bottom:8px">Step 2: Start a course</h3>
+      <p style="margin-bottom:8px">Start with any of these three. All courses are self-paced, so you pick the time.</p>
+      <ul style="padding-left:22px;line-height:1.9">${D.pathway1.map(ibmLink).join('')}</ul></div>`;
+  let seen = false; try { seen = localStorage.getItem('cst_async_ibm_seen') === '1'; } catch (e) {}
+  if (!seen && !isAdmin) {
+    try { localStorage.setItem('cst_async_ibm_seen', '1'); } catch (e) {}
+    ibmModal();
+  }
+}
+function ibmModal() {
+  const m = document.createElement('div');
+  m.id = 'ibm-modal';
+  m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.setAttribute('aria-labelledby', 'ibm-modal-h');
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  m.innerHTML = `<div style="background:#fff;color:#222;border-radius:12px;max-width:460px;padding:24px 26px">
+    <h3 id="ibm-modal-h" style="margin-bottom:10px">You earned IBM SkillsBuild</h3>
+    <p style="margin-bottom:16px;line-height:1.5">You have earned premium access to IBM SkillsBuild as a Culinary Coach learner. Register with the link below. The link connects you to the Culinary Coach partnership.</p>
+    <a class="btn-submit-work" style="display:inline-block;text-decoration:none" href="${esc(window.IBM_SKILLSBUILD.register.url)}" target="_blank" rel="noopener">Register for IBM SkillsBuild</a>
+    <button class="link-btn" style="margin-left:14px" onclick="document.getElementById('ibm-modal').remove()">Close</button></div>`;
+  document.body.appendChild(m);
+}
+
 function showGate(n) {
   document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
   let page = document.getElementById('page-gate');
@@ -1768,6 +1805,7 @@ function showPage(id) {
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.toggle('active', s.dataset.page === id));
   const wm = /^w([1-8])$/.exec(id);
   if (wm && !weekUnlocked(Number(wm[1]))) { showGate(Number(wm[1])); return; }
+  if (id === 'ibm' && !ibmUnlocked()) { showPage('dashboard'); return; }
 
   document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
   const page = document.getElementById('page-' + id);
@@ -1778,6 +1816,7 @@ function showPage(id) {
   if (id === 'quizreview') buildQuizReview();
   if (id === 'my-grades') buildMyGrades();
   if (id === 'krp') renderKrpItems();
+  if (id === 'ibm') renderIbm();
   updateProgress();
 }
 
@@ -2197,6 +2236,9 @@ function updateProgress() {
   document.getElementById('stat-score').textContent = taken.length ? Math.round(taken.filter(([, q]) => q.passed).length / taken.length * 100) + '%' : '—';
   const l2 = document.getElementById('l2-banner');
   if (l2) l2.style.display = memCache.ready_l2 && !isAdmin ? 'flex' : 'none';
+  const ibmOn = ibmUnlocked();
+  const sbi = document.getElementById('sb-ibm'); if (sbi) sbi.style.display = ibmOn ? '' : 'none';
+  const ib = document.getElementById('ibm-banner'); if (ib) ib.style.display = ibmOn && !isAdmin ? 'flex' : 'none';
 }
 
 function refreshAll() {
