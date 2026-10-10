@@ -1591,7 +1591,6 @@ body {
     <aside class="sidebar" id="sidebar"></aside>
     <main class="main-content">
       <div class="page-view" id="page-programs"></div>
-      <div class="page-view" id="page-ibm"></div>
       <div class="page-view active" id="page-dashboard"></div>
       <div class="page-view" id="page-w1"></div>
       <div class="page-view" id="page-w2"></div>
@@ -1873,8 +1872,7 @@ function itemDone(it) {
 function renderSidebar() {
   let h = `<div class="sidebar-section"><div class="sidebar-heading">Navigation</div>
     <div class="sidebar-item" data-page="programs" onclick="showPage('programs')"><div class="week-badge" style="background:var(--green-mid)">▦</div><span class="sidebar-item-label">All Levels</span></div>
-    <div class="sidebar-item active" data-page="dashboard" onclick="showPage('dashboard')"><div class="week-badge gold">⌂</div><span class="sidebar-item-label">Dashboard</span></div>
-    <div class="sidebar-item" data-page="ibm" onclick="showPage('ibm')"><div class="week-badge" style="background:#1f70c1">IBM</div><span class="sidebar-item-label">IBM SkillsBuild</span></div></div>`;
+    <div class="sidebar-item active" data-page="dashboard" onclick="showPage('dashboard')"><div class="week-badge gold">⌂</div><span class="sidebar-item-label">Dashboard</span></div>`;
   LEVEL1.weeks.forEach(w => {
     h += `<div class="sidebar-section"><div class="sidebar-heading">Week ${w.n} · ${esc(w.dates)}</div>
       <div class="sidebar-item" data-page="w${w.n}" onclick="showPage('w${w.n}')" id="sb-w${w.n}">
@@ -1927,29 +1925,23 @@ function renderPrograms() {
       </div>
       <div class="level-cards">${cards}</div>
       <div class="hub-ibm-note"><div class="ibm-icon">🎓</div>
-        <div><strong>IBM SkillsBuild</strong> is part of Level 2. You have premium access to IBM courses that match what you are learning, and some of them earn digital badges for your resume. <button class="link-btn" onclick="showPage('ibm')">Open IBM SkillsBuild</button></div></div>
+        <div><strong>IBM SkillsBuild</strong> is part of Level 2. You have premium access to IBM courses that match what you are learning. Look for the IBM SkillsBuild box at the bottom of Weeks 1, 3, and 4. Some courses earn digital badges for your resume.</div></div>
     </div>`;
 }
 
 function ibmCourseList(list) {
-  return `<ul class="ibm-courses">${list.map(c => `<li class="${c.pinned ? 'pinned' : ''}${c.ai ? ' ibm-ai' : ''}">
-      <a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.title)}</a>${c.pinned ? '<span class="pin-tag">START HERE</span>' : ''}
+  return `<ul class="ibm-courses">${list.map(c => `<li class="${c.ai ? 'ibm-ai' : ''}">
+      <a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.title)}</a>
       <div class="why">${esc(c.why)}</div></li>`).join('')}</ul>`;
 }
-function ibmRegisterStep() {
-  const r = window.IBM_COHORT.register;
-  return `<div class="ibm-step"><h3>Step 1: Register</h3>
-    <p>Register first. Use this link so your account is connected to Culinary Coach.</p>
-    <a class="ibm-btn" href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a></div>`;
-}
-function renderIbm() {
-  document.getElementById('page-ibm').innerHTML = `
-    <div class="dash-header"><div class="eyebrow">Culinary Coach LLC</div><h2>IBM SkillsBuild</h2>
-      <p>As a Culinary Coach learner, you have premium access to IBM SkillsBuild. These courses go with what you are learning here. All of them are self-paced, and some earn digital badges you can add to your resume.</p></div>
-    ${ibmRegisterStep()}
-    <div class="ibm-step"><h3>Step 2: Pick a course</h3>
-      <p>These are your Level 2 courses. They fit Culinary Entrepreneurship I. Start with any one.</p>
-      ${ibmCourseList(window.IBM_COHORT.level2)}</div>`;
+// IBM SkillsBuild shows only inside the week whose lessons it supports (Week 2 has none: ServSafe is the credential that week).
+function ibmWeekBlock(n) {
+  const D = window.IBM_COHORT, list = D.level2.filter(c => c.week === n);
+  if (!list.length) return '';
+  return `<div class="ibm-step" id="ibm-w${n}"><h3>IBM SkillsBuild · Week ${n}</h3>
+    <p>These IBM courses go with this week. Register first, then pick a course. Some earn a digital badge for your resume.</p>
+    <p><a class="ibm-btn" href="${esc(D.register.url)}" target="_blank" rel="noopener">${esc(D.register.title)}</a></p>
+    ${ibmCourseList(list)}</div>`;
 }
 
 function renderDashboard() {
@@ -2062,7 +2054,8 @@ function renderWeeks() {
       <a class="btn-servsafe" href="https://www.servsafe.com/ServSafe-Food-Handler/Get-Certified" target="_blank" rel="noopener noreferrer">→ ServSafe Food Handler</a></div><br>` : '';
     document.getElementById('page-w' + w.n).innerHTML = `
       <div class="week-header"><div class="wh-eyebrow">Week ${w.n} · ${esc(w.long)}</div><h2>${esc(w.title)}</h2><div class="wh-dates">${esc(w.note)}</div></div>
-      ${ss}<div class="day-list">${DAYS.filter(d => d.week === w.n).map(renderDayCard).join('')}</div>`;
+      ${ss}<div class="day-list">${DAYS.filter(d => d.week === w.n).map(renderDayCard).join('')}</div>
+      ${ibmWeekBlock(w.n)}`;
   });
 }
 
@@ -2185,7 +2178,6 @@ function showPage(id) {
   if (id === 'my-grades') buildMyGrades();
   if (id === 'krp') renderKrpItems();
   if (id === 'programs') renderPrograms();
-  if (id === 'ibm') renderIbm();
   updateProgress();
 }
 
