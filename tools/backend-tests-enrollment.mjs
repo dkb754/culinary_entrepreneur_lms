@@ -81,10 +81,13 @@ await t('validation', async () => {
   await reset();
   const bot = await enroll({ name: 'Bot Person', email: 'bot@example.com', source: 'culinarycoach', website: 'http://spam.example' });
   ok(bot.status === 200 && !bot.body.code && !rowFor('bot@example.com') && (await mail()).length === 0, 'a filled honeypot field looks successful but creates nothing and sends nothing');
-  const opt = await fetch(`${API}/functions/v1/cst-enrollment`, { method: 'OPTIONS', headers: { origin: 'https://culinarycoach.org' } });
-  eq(opt.headers.get('access-control-allow-origin'), 'https://culinarycoach.org', 'the culinarycoach.org form is allowed by CORS');
-  const bad = await fetch(`${API}/functions/v1/cst-enrollment`, { method: 'OPTIONS', headers: { origin: 'https://evil.example' } });
-  ok(!bad.headers.get('access-control-allow-origin'), 'other websites are not allowed by CORS');
+  // Browser-permission policy, checked on the real POST answer (the local test stack answers the OPTIONS preflight itself)
+  const good = await enroll({ name: 'Cors Good', email: 'cors.good@example.com', source: 'culinarycoach' }, freshIp(), { origin: 'https://culinarycoach.org' });
+  eq(good.status, 200, 'a submission from the culinarycoach.org form is accepted');
+  const rGood = await fetch(`${API}/functions/v1/cst-enrollment`, { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': freshIp(), origin: 'https://redshirtops.com' }, body: JSON.stringify({ name: 'Cors Two', email: 'cors.two@example.com', source: 'redshirtops' }) });
+  eq(rGood.headers.get('access-control-allow-origin'), 'https://redshirtops.com', 'a page on redshirtops.com is allowed to read the answer');
+  const rBad = await fetch(`${API}/functions/v1/cst-enrollment`, { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': freshIp(), origin: 'https://evil.example' }, body: JSON.stringify({ name: 'Cors Bad', email: 'cors.bad@example.com', source: 'culinarycoach' }) });
+  ok(rBad.headers.get('access-control-allow-origin') !== 'https://evil.example' && rBad.headers.get('access-control-allow-origin') !== '*', 'a page on another website is not allowed to read the answer');
 });
 
 R.section('Repeat submissions and name clashes');
