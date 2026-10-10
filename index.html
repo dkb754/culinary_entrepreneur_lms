@@ -1255,7 +1255,7 @@ body {
   box-shadow: 0 0 0 3px rgba(212,168,67,0.18);
 }
 .level-card.current::before {
-  content: 'YOUR PROGRAM';
+  content: 'YOUR LEVEL';
   position: absolute;
   top: 12px; right: 16px;
   font-family: var(--font-mono);
@@ -1361,6 +1361,12 @@ body {
   .level-icon { width: 42px; height: 42px; font-size: 18px; }
   .level-name { font-size: 16px; }
 }
+
+/* locked levels */
+.level-card.locked { opacity: 1; cursor: default; background: #faf8f3; border-style: dashed; }
+.level-card.locked .level-name { color: var(--gray-600); }
+.level-includes { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: var(--gray-600); line-height: 1.55; }
+.level-unlock { margin-top: 8px; font-size: 13px; color: #8a6012; font-weight: 600; }
 
 /* IBM SkillsBuild pages */
 .ibm-step { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 18px 22px; margin-bottom: 14px; }
@@ -1553,7 +1559,7 @@ body {
     <div class="login-logo">
       <div class="badge">Culinary Coach × OCWB</div>
       <h1>Culinary <span>Entrepreneurship</span> I</h1>
-      <p>Oct 12 – Nov 7, 2026 · Level I Cohort · ServSafe Food Handler</p>
+      <p>Oct 12 – Nov 7, 2026 · Level 2 Cohort · ServSafe Food Handler</p>
     </div>
     <div class="login-form">
       <label for="login-user">Name <span style="opacity:.6">(optional)</span></label>
@@ -1586,8 +1592,6 @@ body {
     <main class="main-content">
       <div class="page-view" id="page-programs"></div>
       <div class="page-view" id="page-ibm"></div>
-      <div class="page-view" id="page-prog-l3"></div>
-      <div class="page-view" id="page-prog-l4"></div>
       <div class="page-view active" id="page-dashboard"></div>
       <div class="page-view" id="page-w1"></div>
       <div class="page-view" id="page-w2"></div>
@@ -1605,7 +1609,7 @@ body {
       </div>
       <div class="page-view" id="page-admin">
         <div class="admin-header">
-          <div><h2>Student Tracker — Level I · Fall 2026</h2>
+          <div><h2>Student Tracker — Level 2 · Fall 2026</h2>
             <p><span id="admin-count">0</span> enrolled students · Culinary Entrepreneurship I</p></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-export" onclick="exportCSV()">Export CSV</button><button class="btn-export" onclick="exportFilesCSV()">Export Files CSV</button><button class="btn-export" onclick="exportReflections()">Export Reflections CSV</button><button class="btn-export" onclick="sendTestCheckin()">Send test check-in email</button></div>
         </div>
@@ -1635,6 +1639,7 @@ body {
   <span id="toast-msg">Saved!</span>
 </div>
 
+<script src="content/programs.js"></script>
 <script src="content/ibm-cohort.js"></script>
 <script src="content/level1.js"></script>
 <script src="content/level1-lessons.js"></script>
@@ -1867,7 +1872,7 @@ function itemDone(it) {
 // ============================================================
 function renderSidebar() {
   let h = `<div class="sidebar-section"><div class="sidebar-heading">Navigation</div>
-    <div class="sidebar-item" data-page="programs" onclick="showPage('programs')"><div class="week-badge" style="background:var(--green-mid)">▦</div><span class="sidebar-item-label">All Programs</span></div>
+    <div class="sidebar-item" data-page="programs" onclick="showPage('programs')"><div class="week-badge" style="background:var(--green-mid)">▦</div><span class="sidebar-item-label">All Levels</span></div>
     <div class="sidebar-item active" data-page="dashboard" onclick="showPage('dashboard')"><div class="week-badge gold">⌂</div><span class="sidebar-item-label">Dashboard</span></div>
     <div class="sidebar-item" data-page="ibm" onclick="showPage('ibm')"><div class="week-badge" style="background:#1f70c1">IBM</div><span class="sidebar-item-label">IBM SkillsBuild</span></div></div>`;
   LEVEL1.weeks.forEach(w => {
@@ -1889,37 +1894,28 @@ function renderSidebar() {
 // ============================================================
 // RENDER: program map (all four programs) and IBM SkillsBuild pages
 // ============================================================
-const PROGRAMS = [
-  { id: 'cst', name: 'Culinary Systems Training', tag: 'Self-Paced · Online', tagClass: 'tag-async', icon: '🍳', iconClass: 'green',
-    desc: 'The online starting point: kitchen systems, workplace habits, and food safety basics. You go at your own pace with your own access code.',
-    ibm: 'IBM SkillsBuild: Lifelong Professional Skills, Collaboration, and Job Readiness.', external: 'https://cst-async.netlify.app/' },
-  { id: 'ce1', name: 'Culinary Entrepreneurship I', tag: 'Cohort · Saturday Labs', tagClass: 'tag-cohort', icon: '📋', iconClass: 'gold', current: true,
-    desc: 'Four weeks of kitchen readiness, costing, menus, and your Concept Brief, with Saturday labs and the ServSafe Food Handler exam.',
-    ibm: 'IBM SkillsBuild Pathway 3 is open to you from Day 1, including the AI money tool.', page: 'dashboard' },
-  { id: 'l3', name: 'Frontline Supervisor Development', tag: 'Employer-Sponsored', tagClass: 'tag-employ', icon: '👥', iconClass: 'blue',
-    desc: 'Leading a team, kitchen communication, and shift management for working cooks and new supervisors. Ask Chef Duane about this program for your employer.',
-    ibm: 'IBM SkillsBuild Pathway 2, with Agile Explorer first.', page: 'prog-l3' },
-  { id: 'l4', name: 'Culinary Entrepreneurship II', tag: 'Cohort · Application & Launch', tagClass: 'tag-adv', icon: '🚀', iconClass: 'orange',
-    desc: 'Business planning, financial projections, and a live pitch for graduates of Culinary Entrepreneurship I, ending with a live pitch and an operating plan.',
-    ibm: 'IBM SkillsBuild: the same Pathway 3 courses, plus Agile Explorer and Data Driven Decision Making.', page: 'prog-l4' },
-];
-
+const OPEN_LEVEL = 'L2';              // this site is Level 2 (Culinary Entrepreneurship I)
+const FREE_LEVEL_LINK = { L1: 'https://cst-async.netlify.app/' };   // Level 1 has its own site and its own access code
 function renderPrograms() {
-  const cards = PROGRAMS.map(p => {
-    const open = p.external
-      ? `onclick="window.open('${esc(p.external)}','_blank','noopener')"`
-      : `onclick="showPage('${p.page}')"`;
-    const pct = p.current ? (document.getElementById('global-pct') || {}).textContent || '0%' : '';
-    return `<div class="level-card unlocked${p.current ? ' current' : ''}" ${open} role="button" tabindex="0" onkeydown="if(event.key==='Enter')this.click()">
+  const pct = (document.getElementById('global-pct') || {}).textContent || '0%';
+  const cards = window.CC_LEVELS.map(p => {
+    const open = p.id === OPEN_LEVEL, link = FREE_LEVEL_LINK[p.id];
+    const live = open || link;
+    const click = open ? `onclick="showPage('dashboard')"` : link ? `onclick="window.open('${esc(link)}','_blank','noopener')"` : '';
+    const list = `<ul class="level-includes">${p.includes.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+    return `<div class="level-card ${live ? 'unlocked' : 'locked'}${open ? ' current' : ''}" ${live ? `${click} role="button" tabindex="0" onkeydown="if(event.key==='Enter')this.click()"` : 'aria-disabled="true"'}>
       <div class="level-icon ${p.iconClass}">${p.icon}</div>
       <div class="level-info">
+        <div class="level-num">${esc(p.num)}</div>
         <div class="level-name">${esc(p.name)}</div>
         <span class="level-tag ${p.tagClass}">${esc(p.tag)}</span>
         <div class="level-desc">${esc(p.desc)}</div>
-        <div class="level-desc" style="margin-top:6px;color:#1a3a7a">${esc(p.ibm)}</div>
-        ${p.current ? `<div class="level-progress-bar" title="Your progress ${esc(pct)}"><div class="level-progress-fill" style="width:${esc(pct)}"></div></div>` : ''}
+        ${list}
+        ${open ? `<div class="level-progress-bar" title="Your progress ${esc(pct)}"><div class="level-progress-fill" style="width:${esc(pct)}"></div></div>`
+          : link ? '<div class="level-unlock">Opens in a new tab. You sign in there with your own access code.</div>'
+          : `<div class="level-unlock">🔒 This level is part of a paid program. To enroll, contact ${CONTACT}</div>`}
       </div>
-      <div class="level-arrow">${p.external ? '↗' : '›'}</div>
+      ${live ? `<div class="level-arrow">${open ? '›' : '↗'}</div>` : '<div class="level-lock">🔒</div>'}
     </div>`;
   }).join('');
   document.getElementById('page-programs').innerHTML = `
@@ -1927,11 +1923,11 @@ function renderPrograms() {
       <div class="level-hub-header">
         <div class="eyebrow">Culinary Coach LLC</div>
         <h2 id="hub-greeting">Welcome back${currentUser ? ', ' + esc(currentUser.split(' ')[0]) : ''}!</h2>
-        <p>These are the Culinary Coach programs. Yours is marked. Open it to see your weeks, quizzes, and labs.</p>
+        <p>Culinary Coach has four levels. You are in Level 2. Open it to see your weeks, quizzes, and labs. You can see what is in each level below.</p>
       </div>
       <div class="level-cards">${cards}</div>
       <div class="hub-ibm-note"><div class="ibm-icon">🎓</div>
-        <div><strong>IBM SkillsBuild</strong> is part of your enrollment. You have premium access to IBM courses that match what you are learning, and some of them earn digital badges for your resume. <button class="link-btn" onclick="showPage('ibm')">Open IBM SkillsBuild</button></div></div>
+        <div><strong>IBM SkillsBuild</strong> is part of Level 2. You have premium access to IBM courses that match what you are learning, and some of them earn digital badges for your resume. <button class="link-btn" onclick="showPage('ibm')">Open IBM SkillsBuild</button></div></div>
     </div>`;
 }
 
@@ -1952,23 +1948,8 @@ function renderIbm() {
       <p>As a Culinary Coach learner, you have premium access to IBM SkillsBuild. These courses go with what you are learning here. All of them are self-paced, and some earn digital badges you can add to your resume.</p></div>
     ${ibmRegisterStep()}
     <div class="ibm-step"><h3>Step 2: Pick a course</h3>
-      <p>These courses fit Culinary Entrepreneurship. Start with any one.</p>
-      ${ibmCourseList(window.IBM_COHORT.pathway3)}</div>`;
-}
-function renderProgramPage(id) {
-  const D = window.IBM_COHORT;
-  const isL3 = id === 'prog-l3';
-  const p = PROGRAMS.find(x => x.page === id);
-  const list = isL3 ? D.pathway2 : D.pathway3.concat(D.level4Extra.filter(e => !D.pathway3.some(x => x.title === e.title)));
-  document.getElementById('page-' + id).innerHTML = `
-    <div class="dash-header">
-      <div style="margin-bottom:12px"><button class="link-btn" onclick="showPage('programs')">‹ All Programs</button></div>
-      <div class="eyebrow">${esc(p.tag)}</div><h2>${esc(p.name)}</h2><p>${esc(p.desc)}</p></div>
-    ${ibmRegisterStep()}
-    <div class="ibm-step"><h3>Step 2: IBM SkillsBuild courses</h3>
-      <p>${isL3 ? 'Start with Agile Explorer. It earns an IBM SkillsBuild digital credential.' : 'Pick up where Culinary Entrepreneurship I left off. These are the same courses, plus two for planning and money.'}</p>
-      ${ibmCourseList(list)}</div>
-    <p style="font-size:13px;color:var(--gray-600)">${isL3 ? 'Lessons for this program are not in this site yet. Contact Chef Duane to set it up for your team.' : 'Lessons for this program open after you finish Culinary Entrepreneurship I. Contact Chef Duane with questions.'}</p>`;
+      <p>These are your Level 2 courses. They fit Culinary Entrepreneurship I. Start with any one.</p>
+      ${ibmCourseList(window.IBM_COHORT.level2)}</div>`;
 }
 
 function renderDashboard() {
@@ -1985,7 +1966,7 @@ function renderDashboard() {
   document.getElementById('page-dashboard').innerHTML = `
     <div class="dash-header"><div class="eyebrow">${esc(LEVEL1.cohort)}</div><h2 id="dash-greeting">Welcome back!</h2>
       <p>4 weeks · Mon–Thu online · Saturday labs in person · ${esc(LAB_PLACE)}</p></div>
-    <div class="l2-banner" id="l2-banner" style="display:none">🎓 <div><strong>You're ready for Level II.</strong> You've passed ServSafe Food Handler, submitted your Concept Brief and passed every quiz. Your instructor will contact you about Culinary Entrepreneurship II.</div></div>
+    <div class="l2-banner" id="l2-banner" style="display:none">🎓 <div><strong>You're ready for Level 4 (Culinary Entrepreneurship II).</strong> You've passed ServSafe Food Handler, submitted your Concept Brief and passed every quiz. Your instructor will contact you about Culinary Entrepreneurship II.</div></div>
     <div class="stats-row">
       <div class="stat-card"><div class="stat-value" id="stat-quizzes">0</div><div class="stat-label">Quizzes Passed</div></div>
       <div class="stat-card"><div class="stat-value" id="stat-deliverables">0</div><div class="stat-label">Deliverables Submitted</div></div>
@@ -2077,7 +2058,7 @@ function menuExampleHtml() {
 function renderWeeks() {
   LEVEL1.weeks.forEach(w => {
     const ss = w.n === 2 ? `<div class="servsafe-card"><h3>🛡️ ServSafe Food Handler Certification</h3>
-      <p>This is your Level I credential. You prepare online this week, sit a proctored practice exam at Lab 2 (Oct 24), and take the ServSafe Food Handler exam at Lab 4 (Nov 7). The exam is 40 questions and you need 75% or higher. Your instructor provides your ServSafe access.</p>
+      <p>This is your Level 2 credential. You prepare online this week, sit a proctored practice exam at Lab 2 (Oct 24), and take the ServSafe Food Handler exam at Lab 4 (Nov 7). The exam is 40 questions and you need 75% or higher. Your instructor provides your ServSafe access.</p>
       <a class="btn-servsafe" href="https://www.servsafe.com/ServSafe-Food-Handler/Get-Certified" target="_blank" rel="noopener noreferrer">→ ServSafe Food Handler</a></div><br>` : '';
     document.getElementById('page-w' + w.n).innerHTML = `
       <div class="week-header"><div class="wh-eyebrow">Week ${w.n} · ${esc(w.long)}</div><h2>${esc(w.title)}</h2><div class="wh-dates">${esc(w.note)}</div></div>
@@ -2205,7 +2186,6 @@ function showPage(id) {
   if (id === 'krp') renderKrpItems();
   if (id === 'programs') renderPrograms();
   if (id === 'ibm') renderIbm();
-  if (id === 'prog-l3' || id === 'prog-l4') renderProgramPage(id);
   updateProgress();
 }
 

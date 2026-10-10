@@ -12,7 +12,7 @@ const YT = id => 'https://www.youtube.com/watch?v=' + id;
 
 const LEVEL1 = {
   title: 'Culinary Entrepreneurship I',
-  cohort: 'Level I · Fall 2026',
+  cohort: 'Level 2 · Fall 2026',
   dates: 'Oct 12 – Nov 7, 2026',
   weeks: [
     {
