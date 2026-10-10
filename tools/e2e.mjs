@@ -187,6 +187,12 @@ R.section('Gates and dashboard (student)');
 {
   const { page, errors } = await newPage(browser, be);
   await login(page, 'MOCK-CST-A'); await appUp(page);
+  ok(await page.locator('#page-programs.active').count() === 1, 'after sign-in the learner lands on the program list');
+  const hub = await page.locator('#page-programs').innerText();
+  ok(await page.locator('#page-programs .level-card').count() === 4 && /Culinary Systems Training/.test(hub) && /Culinary Entrepreneurship I\b/.test(hub) && /Frontline Supervisor Development/.test(hub) && /Culinary Entrepreneurship II/.test(hub), 'the program list shows all four programs', hub.slice(0, 300) + ' | cards=' + await page.locator('#page-programs .level-card').count());
+  ok(await page.locator('#page-programs .level-card.current').count() === 1 && /Culinary Systems Training/.test(await page.locator('#page-programs .level-card.current').innerText()), 'this course is marked as the learner\'s program', 'current=' + await page.locator('#page-programs .level-card.current').count());
+  ok(!/\bfree\b/i.test(hub), 'the program list never says "free"');
+  await page.evaluate(() => showPage('dashboard'));
   const dash = await page.locator('#page-dashboard').innerText();
   ok(/Current Week/i.test(dash) && /Quiz Pass Rate/i.test(dash) && /Deliverables Submitted/i.test(dash) && /Quizzes Passed/i.test(dash), 'dashboard shows current week, quiz pass rate, quizzes passed and deliverables');
   ok(!/Upcoming|Lab|Saturday|cohort/i.test(dash), 'dashboard has no lab cards, Saturday dates or cohort calendar');
