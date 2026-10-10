@@ -336,13 +336,23 @@ R.section('Login, page hygiene and student view');
   const shipped = await page.evaluate(() => JSON.stringify(window.IBM_COHORT));
   ok(!/PLAN-716FDF294AB3|PLAN-DA092DF5FEDD|PLAN-B8A361A0B47A|ALM-COURSE_4058990/.test(shipped), 'the IBM links for locked levels are not shipped to the browser');
   ok(await page.locator('#page-prog-l3, #page-prog-l4').count() === 0, 'there are no pages for the locked levels');
-  await page.evaluate(() => showPage('ibm'));
-  const ibm = await page.locator('#page-ibm a').evaluateAll(as => as.map(a => ({ t: a.textContent.trim(), h: a.href, tg: a.target })));
-  ok(ibm.length === 12 && ibm[0].t === 'Register for IBM SkillsBuild' && ibm[0].h === 'https://skills.yourlearning.ibm.com/?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach', 'IBM SkillsBuild: the registration link first, then 11 courses', JSON.stringify(ibm.map(l => l.t)));
-  ok(['Be an Entrepreneur', 'Entrepreneur Mindset', 'Project Management Fundamentals', 'How Smart Is Your Spending?', 'Sales Strategy', 'Digital Marketing', 'The Marketing Funnel', 'Operations Management', 'Digital Literacy', 'AI Literacy', 'Excel Training'].every((t, i) => ibm[i + 1].t === t), 'the 11 Level 2 courses are listed in order');
-  ok(ibm.every(l => l.tg === '_blank' && /^https:\/\/skills\.yourlearning\.ibm\.com\/((activity|channel)\/[\w-]+)?\?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach$/.test(l.h)), 'every IBM link opens in a new tab with the full tracking string');
-  ok(/use AI to track your money/.test(await text(page, '#page-ibm')) && /digital badge/.test(await text(page, '#page-ibm')) && /Level 2 courses/.test(await text(page, '#page-ibm')), 'the AI money course has its plain-language blurb, and the page says these are Level 2 courses');
-  ok(!/\bfree\b|pathway/i.test(await text(page, '#page-ibm') + await text(page, '#sidebar') + hub), 'the IBM SkillsBuild and level pages never say "free" or "pathway"');
+  // IBM SkillsBuild lives only inside the weekly modules it supports
+  ok(await page.locator('#sb-ibm, [data-page="ibm"], #page-ibm').count() === 0, 'there is no all-in-one IBM SkillsBuild tab or page');
+  const WEEK_COURSES = { 1: ['Project Management Fundamentals', 'Operations Management'], 2: [], 3: ['How Smart Is Your Spending?', 'Sales Strategy', 'The Marketing Funnel', 'Excel Training'], 4: ['Be an Entrepreneur', 'Entrepreneur Mindset', 'Digital Marketing', 'Digital Literacy', 'AI Literacy'] };
+  const TRACK = /^https:\/\/skills\.yourlearning\.ibm\.com\/((activity|channel)\/[\w-]+)?\?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach$/;
+  let totalCourses = 0;
+  for (const n of [1, 2, 3, 4]) {
+    const links = await page.locator(`#page-w${n} .ibm-step a`).evaluateAll(as => as.map(a => ({ t: a.textContent.trim(), h: a.href, tg: a.target })));
+    const want = WEEK_COURSES[n];
+    if (!want.length) { ok(links.length === 0 && await page.locator(`#ibm-w${n}`).count() === 0, `Week ${n} has no IBM block (nothing aligns with ServSafe)`); continue; }
+    totalCourses += links.length - 1;
+    ok(links[0].t === 'Register for IBM SkillsBuild' && links[0].h === 'https://skills.yourlearning.ibm.com/?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach', `Week ${n}: the registration link comes first`);
+    ok(JSON.stringify(links.slice(1).map(l => l.t)) === JSON.stringify(want), `Week ${n}: IBM courses are ${want.join(', ')}`, JSON.stringify(links.map(l => l.t)));
+    ok(links.every(l => l.tg === '_blank' && TRACK.test(l.h)), `Week ${n}: every IBM link opens in a new tab with the full tracking string`);
+  }
+  ok(totalCourses === 11, 'all 11 Level 2 courses are placed, each in exactly one week', String(totalCourses));
+  ok(await page.locator('#page-w3 .ibm-ai').count() === 1 && /use AI to track your money/.test(await text(page, '#page-w3')) && /digital badge/.test(await text(page, '#page-w3')), 'the AI money course sits in Week 3 (costing) with its plain-language blurb');
+  ok(!/\bfree\b|pathway/i.test((await page.locator('.ibm-step').allTextContents()).join(' ') + hub), 'weekly IBM blocks and the level list never say "free" or "pathway"')
   await page.evaluate(() => showPage('dashboard'));
   ok(/level 2/i.test(await text(page, '#page-dashboard .dash-header')), 'dashboard says Level 2');
   ok(!/VCU/i.test(await page.content()) && !/VCU/i.test(body), 'no VCU references anywhere on the page');
