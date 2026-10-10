@@ -40,7 +40,7 @@ function makeBackend() {
   const passedAll = (r, ids) => ids.every(id => r.quizzes[id]?.passed);
   const ready = r => passedAll(r, L1_IDS) && !!r.deliverables.w4d3;
   const weeks = r => { const out = [1]; for (let n = 2; n <= 8; n++) if ((out.includes(n - 1) && passedAll(r, weekQ(n - 1)) && (n !== 5 || ready(r))) || n <= r.unlock_through) out.push(n); return out; };
-  const prog = r => ({ ...r, unlocked_weeks: weeks(r), ready_l2: ready(r), l1_done: passedAll(r, L1_IDS) });
+  const prog = r => ({ ...r, unlocked_weeks: weeks(r), ready_l2: ready(r), l1_done: passedAll(r, L1_IDS), module_2_complete: passedAll(r, weekQ(2)) });
 
   async function login(route) {
     const req = route.request();
@@ -70,7 +70,7 @@ function makeBackend() {
     const adminOnly = () => !s.admin && (reply(route, 403, { error: 'forbidden' }), true);
     switch (b.action) {
       case 'logout': sessions.delete(b.token); return reply(route, 200, { ok: true });
-      case 'load': return reply(route, 200, { progress: s.admin ? { ...prog(row('x')), unlocked_weeks: [1, 2, 3, 4, 5, 6, 7, 8] } : prog(row(s.name)), settings, is_admin: !!s.admin });
+      case 'load': return reply(route, 200, { progress: s.admin ? { ...prog(row('x')), unlocked_weeks: [1, 2, 3, 4, 5, 6, 7, 8], module_2_complete: true } : prog(row(s.name)), settings, is_admin: !!s.admin });
       case 'save': {
         const r = row(s.name), open = weeks(r);
         for (const [k, v] of Object.entries(b.quizzes || {})) {
@@ -192,6 +192,9 @@ R.section('Gates and dashboard (student)');
   ok(!/Upcoming|Lab|Saturday|cohort/i.test(dash), 'dashboard has no lab cards, Saturday dates or cohort calendar');
   ok(await page.locator('#page-dashboard .week-card').count() === 8, 'dashboard has 8 week cards');
   ok(await page.locator('#l2-banner').isHidden(), 'the Level II callout is hidden at the start');
+  ok(await page.locator('#sb-ibm').isHidden() && await page.locator('#ibm-banner').isHidden(), 'IBM SkillsBuild is hidden before Module 2 is complete');
+  await page.evaluate(() => showPage('ibm'));
+  ok(await page.locator('#page-ibm.active').count() === 0, 'the IBM SkillsBuild page cannot be opened early');
   ok(/Level II · Week 1/i.test(await page.locator('#sidebar').innerText()) && /Level II · Week 4/i.test(await page.locator('#sidebar').innerText()), 'sidebar labels weeks 5–8 as Level II · Week 1–4');
   ok(await page.locator('#sb-w2-badge.locked, #sb-w3-badge.locked, #sb-w5-badge.locked').count() === 3, 'weeks 2, 3 and 5 show a lock');
   await page.evaluate(() => showPage('w2'));
@@ -218,6 +221,18 @@ R.section('Gates and dashboard (student)');
   await answerQuiz(page, fail);
   await page.waitForFunction(() => weekUnlocked(3));
   ok(true, 'the retry pass opens Week 3');
+  ok(await page.locator('#sb-ibm').isVisible() && /IBM SkillsBuild/.test(await page.locator('#sb-ibm').innerText()), 'finishing every Week 2 quiz adds the "IBM SkillsBuild" sidebar item');
+  await page.evaluate(() => showPage('dashboard'));
+  ok(await page.locator('#ibm-banner').isVisible() && /premium access to IBM SkillsBuild/.test(await page.locator('#ibm-banner').innerText()), 'the dashboard shows the IBM SkillsBuild banner');
+  await page.evaluate(() => showPage('ibm'));
+  ok(await page.locator('#ibm-modal').isVisible() && /earned premium access to IBM SkillsBuild/.test(await page.locator('#ibm-modal').innerText()), 'the unlock message appears the first time');
+  await page.evaluate(() => document.getElementById('ibm-modal').remove());
+  const ibmLinks = await page.locator('#page-ibm a').evaluateAll(as => as.map(a => ({ t: a.textContent.trim(), h: a.href, tg: a.target })));
+  ok(ibmLinks.length === 4 && ibmLinks[0].t === 'Register for IBM SkillsBuild' && ibmLinks[0].h === 'https://skills.yourlearning.ibm.com/?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach', 'the registration link is listed first, then 3 courses', JSON.stringify(ibmLinks.map(l => l.t)));
+  ok(['Lifelong Professional Skills', 'Collaboration', 'Job Readiness'].every((t, i) => ibmLinks[i + 1].t === t && ibmLinks[i + 1].h.endsWith('&utm_campaign=culinarycoach')), 'the three Pathway 1 courses carry the Culinary Coach tracking tags');
+  ok(ibmLinks.every(l => l.tg === '_blank'), 'every IBM SkillsBuild link opens in a new tab');
+  ok(!/\bfree\b/i.test(await page.locator('#page-ibm').innerText()), 'the IBM SkillsBuild page never says "free"');
+  await page.evaluate(() => showPage('w3'));
   for (const n of [3, 4]) for (const id of weekQ(n)) { await page.evaluate(() => { }); await answerQuiz(page, id); await page.waitForTimeout(150); }
   await page.waitForFunction(() => weekUnlocked(4));
   ok(await page.evaluate(() => !weekUnlocked(5)), 'every Level I quiz passed does not open Level II by itself');
