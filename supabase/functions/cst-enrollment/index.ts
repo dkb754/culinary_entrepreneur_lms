@@ -29,7 +29,7 @@ const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 
 function cors(req: Request): Record<string, string> {
   const o = req.headers.get("origin") || "";
-  const h: Record<string, string> = { "Access-Control-Allow-Headers": "content-type", "Access-Control-Allow-Methods": "POST, GET, OPTIONS", "Vary": "Origin" };
+  const h: Record<string, string> = { "Access-Control-Allow-Headers": "content-type, apikey, authorization, x-client-info", "Access-Control-Allow-Methods": "POST, GET, OPTIONS", "Vary": "Origin" };
   if (ORIGINS.has(o)) h["Access-Control-Allow-Origin"] = o;
   return h;
 }
