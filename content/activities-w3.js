@@ -39,7 +39,7 @@ ACTIVITIES.w3d1 = {
       items: [
         { q: 'Your chicken plate costs $4.20 and you want a 30% food cost. What is the minimum sale price?', opts: ['$12.60', '$14.00', '$16.80', '$8.40'], ans: 1, why: '4.20 ÷ 0.30 = $14.00. Multiplying by 3 instead of dividing by 0.30 happens to get close, but always use the formula: Plate Cost ÷ Target %.' },
         { q: 'Your math says $13.33, but comparable items at your farmers market sell for $8. What is the sensible next step?', opts: ['Charge $13.33 anyway because the math says so', 'Drop to $8 without looking at costs', 'Treat the gap as a warning: recheck your plate cost and portion, and decide whether your product or market needs to change', 'Ignore the market, since customers will pay for anything'], ans: 2, why: 'The lesson’s market pricing check asks whether the market supports your math. A big gap means revisiting plate cost, portion size, the target, or where you sell. Do not simply pick one number and hope.' },
-        { q: 'Break-even is best described as:', opts: ['The price where food cost is exactly 30%', 'The number of units you must sell to cover your costs before you make a profit', 'The day the market opens', 'Half of your plate cost'], ans: 1, why: 'Break-even is the number of units you must sell to cover costs before any profit. It is covered in depth in Level II.' },
+        { q: 'Break-even is best described as:', opts: ['The price where food cost is exactly 30%', 'The number of units you must sell to cover your costs before you make a profit', 'The day the market opens', 'Half of your plate cost'], ans: 1, why: 'Break-even is the number of units you must sell to cover costs before any profit. It is covered in depth in Part 2.' },
       ],
     },
     {

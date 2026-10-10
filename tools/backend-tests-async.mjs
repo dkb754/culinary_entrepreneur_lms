@@ -63,7 +63,7 @@ const ta = await session('CST-FIXTURE-A');
 await t('gates', async () => {
   const l = await api(ta, 'load');
   eq(l.body.progress.unlocked_weeks, [1], 'Week 1 is open on enrollment and nothing else');
-  ok(l.body.settings.published_quizzes.length === 14 && !l.body.settings.published_quizzes.includes('w5d1'), 'Level I quizzes are published, Level II quizzes are not');
+  ok(l.body.settings.published_quizzes.length === 14 && !l.body.settings.published_quizzes.includes('w5d1'), 'Part 1 quizzes are published, Part 2 quizzes are not');
   const jump = await api(ta, 'save', { quizzes: scores([...WEEK[1], ...WEEK[2]]) });
   eq(Object.keys(jump.body.progress.quizzes).sort(), WEEK[1], 'quizzes from a locked week are ignored even when sent together with open ones');
   eq(jump.body.progress.unlocked_weeks, [1, 2], 'passing every Week 1 quiz opens Week 2');
@@ -81,7 +81,7 @@ await t('gates', async () => {
   const down = await api(ta, 'save', { quizzes: scores(['w1d1'], 10) });
   eq(down.body.progress.quizzes.w1d1.score, 100, 'a worse retake never lowers the best score');
   const l2q = await api(ta, 'save', { quizzes: scores(['w5d1']) });
-  ok(!l2q.body.progress.quizzes.w5d1, 'an unpublished Level II quiz cannot be scored');
+  ok(!l2q.body.progress.quizzes.w5d1, 'an unpublished Part 2 quiz cannot be scored');
 });
 
 R.section('Activities and uploads respect the gates');
@@ -91,7 +91,7 @@ await t('activities', async () => {
   const good = await api(ta, 'save-activity', { id: 'a_w1d1_p1', score: 80, texts: { a: 'hello' } });
   ok(good.status === 200 && good.body.progress.exercises.a_w1d1_p1.passed, 'an activity in an open week is saved');
   const l2 = await api(ta, 'save-activity', { id: 'a_w5d1_p1', score: 80 });
-  eq(l2.status, 403, 'a Level II activity is refused before Level II is open');
+  eq(l2.status, 403, 'a Part 2 activity is refused before Part 2 is open');
   const bad = await api(ta, 'save-activity', { id: 'a_w9d1_p1', score: 80 });
   eq(bad.status, 400, 'week 9 is not a real activity id');
   const lab = await api(ta, 'save-activity', { id: 'a_w1lab_p1', score: 80 });
@@ -102,25 +102,25 @@ await t('activities', async () => {
   eq(unk.status, 400, 'lab deliverables are gone (unknown assignment)');
 });
 
-R.section('Level I to Level II (quizzes + Concept Brief)');
+R.section('Part 1 to Part 2 (quizzes + Concept Brief)');
 await t('l2', async () => {
   await api(ta, 'save', { quizzes: scores(WEEK[3]) });
   const w4 = await api(ta, 'save', { quizzes: scores(WEEK[4]) });
-  eq(w4.body.progress.unlocked_weeks, [1, 2, 3, 4], 'all of Level I passed still does not open Level II on its own');
-  ok(w4.body.progress.l1_done === true && w4.body.progress.ready_l2 === false, 'Level I is done but not ready for Level II without the Concept Brief');
+  eq(w4.body.progress.unlocked_weeks, [1, 2, 3, 4], 'all of Part 1 passed still does not open Part 2 on its own');
+  ok(w4.body.progress.l1_done === true && w4.body.progress.ready_l2 === false, 'Part 1 is done but not ready for Part 2 without the Concept Brief');
   ok(w4.body.progress.quizzes.w4d2.at, 'Quiz 14 (w4d2) carries the pass time that starts the 90-day check-in');
   const bytes = Buffer.from('%PDF-1.4 concept brief');
   const up = await upload(ta, 'w4d3', 'My Concept Brief.pdf', bytes);
   ok(up.c.status === 200 && up.put.ok, 'the signed upload works', JSON.stringify(up.c));
   ok(up.c.body.path.startsWith('cst-async/cst-student-a/concept-brief/'), 'the file goes under cst-async/{student}/{assignment}/', up.c.body.path);
   const rec = await api(ta, 'record-submission', { assignment: 'w4d3', path: up.c.body.path, filename: 'My Concept Brief.pdf' });
-  ok(rec.status === 200 && rec.body.progress.ready_l2 === true, 'submitting the Concept Brief marks the student ready for Level II', JSON.stringify(rec));
-  eq(rec.body.progress.unlocked_weeks, [1, 2, 3, 4, 5], 'Level II Week 1 (week 5) opens automatically');
+  ok(rec.status === 200 && rec.body.progress.ready_l2 === true, 'submitting the Concept Brief marks the student ready for Part 2', JSON.stringify(rec));
+  eq(rec.body.progress.unlocked_weeks, [1, 2, 3, 4, 5], 'Part 2 Week 1 (week 5) opens automatically');
   eq(jsonQ(`select assignment_id, student_name from public.submissions where file_path = '${up.c.body.path}'`), [{ assignment_id: 'w4d3', student_name: SA }], 'the submission row is in the database');
   const steal = await api(ta, 'record-submission', { assignment: 'w4d3', path: 'cst-async/cst-student-b/concept-brief/x.pdf', filename: 'x.pdf' });
   eq(steal.status, 403, 'a student cannot record a path in someone else\'s folder');
   const act = await api(ta, 'save-activity', { id: 'a_w5d1_p1', score: 90 });
-  eq(act.status, 200, 'Level II activities now save');
+  eq(act.status, 200, 'Part 2 activities now save');
   eq(progress(SA).level, 'cst-async', 'the progress row is tagged cst-async');
 });
 
@@ -148,9 +148,9 @@ await t('admin', async () => {
   eq(un.body.progress.unlocked_weeks, [1, 2, 3], 'the optional override opens weeks up to the chosen one');
   eq((await api(adm, 'admin-unlock', { student_name: 'CI Student A', through: 3 })).status, 404, 'the override cannot reach a cohort student');
   const pub = await api(adm, 'admin-set-published', { quiz_id: 'w5d1', published: true });
-  ok(pub.body.published_quizzes.includes('w5d1'), 'Level II quizzes can be published');
+  ok(pub.body.published_quizzes.includes('w5d1'), 'Part 2 quizzes can be published');
   const sc = await api(ta, 'save', { quizzes: scores(['w5d1']) });
-  ok(sc.body.progress.quizzes.w5d1?.passed, 'once published (and Level II is open) a Level II quiz scores');
+  ok(sc.body.progress.quizzes.w5d1?.passed, 'once published (and Part 2 is open) a Part 2 quiz scores');
   await api(adm, 'admin-set-published', { quiz_id: 'w5d1', published: false });
   const dl = await api(adm, 'admin-file-url', { path: 'cst-async/cst-student-a/concept-brief/' + sql(`select split_part(file_path,'/',4) from public.submissions where student_name='${SA}' limit 1`) });
   ok(dl.status === 200 && /^https?:/.test(dl.body.url || ''), 'the instructor gets a short-lived download link');

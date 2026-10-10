@@ -1,4 +1,4 @@
-/* Level II · Week 2 (week 6) quizzes. DRAFT. Uses Q and QUIZ_BANK from level1-quizzes.js. */
+/* Part 2 · Week 2 (week 6) quizzes. DRAFT. Uses Q and QUIZ_BANK from level1-quizzes.js. */
 QUIZ_BANK.w6d1 = { title: "Quiz 19 · Startup Costs & Funding", passPct: 70, questions: [
   Q("What is a startup cost?", "Money paid once, or a few times, to get ready to open", ["A cost that repeats every month","Money a customer pays you","A tax refund"], "A startup cost is a one-time cost to get ready, such as a mixer or permits."),
   Q("Which is an ongoing cost?", "Monthly kitchen rental", ["A mixer bought before opening","A logo designed once","Permit fee paid once"], "Rent returns every month."),

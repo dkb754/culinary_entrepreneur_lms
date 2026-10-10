@@ -1,4 +1,4 @@
-/* Level II · Week 8 quizzes (DRAFT). Uses Q and QUIZ_BANK from level1-quizzes.js. */
+/* Part 2 · Week 8 quizzes (DRAFT). Uses Q and QUIZ_BANK from level1-quizzes.js. */
 QUIZ_BANK.w8d1 = { title: 'Quiz 27 · Brand & Customer Story', passPct: 70, questions: [
   Q('A brand is best described as:', 'The picture and feeling people have of your business', ['Only your logo', 'Only your price list', 'Only your business license'], 'A brand is built from many small moments, not just a logo.'),
   Q('Where should a brand start?', 'With your customer', ['With a famous chain', 'With your favorite color', 'With the cheapest option'], 'Your brand should speak to the customer you planned for.'),
@@ -48,7 +48,7 @@ QUIZ_BANK.w8d4 = { title: 'Quiz 30 · Your Pitch & Operating Plan', passPct: 70,
   Q('Why is the ask important?', 'If you do not ask, nothing happens', ['It is required by law', 'It lowers prices', 'It is optional filler'], 'Say clearly what you want the listener to do.'),
   Q('A meal sells for $12 and costs $5 to make. You keep before other costs:', '$7', ['$17', '$5', '$12'], '12 minus 5 is 7.'),
   Q('If you do not know the answer to a rules question you should:', 'Name the local office you will ask and when', ['Guess', 'Say there are no rules', 'Leave'], 'Do not guess about rules.'),
-  Q('The Operating Plan is:', 'One document showing how the business runs day to day', ['A logo', 'A tax return', 'A menu only'], 'It is the capstone of Level II.'),
+  Q('The Operating Plan is:', 'One document showing how the business runs day to day', ['A logo', 'A tax return', 'A menu only'], 'It is the capstone of Part 2.'),
   Q('Which is NOT one of the six Operating Plan sections?', 'Logo animation', ['Suppliers and ordering', 'Schedule and roles', 'Quality checklists'], 'The six sections cover workflow, suppliers, schedule, quality, safety and launch.'),
   Q('Where a plan has a missing answer, you should:', 'Write "to find out," who you will ask and by when', ['Hide it', 'Invent an answer', 'Delete the section'], 'A plan that shows its gaps is more useful.'),
   Q('You make 15 portions an hour for 4 hours. Capacity is:', '60 portions', ['19 portions', '11 portions', '100 portions'], '15 times 4 is 60.'),

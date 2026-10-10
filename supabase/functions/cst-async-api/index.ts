@@ -6,7 +6,7 @@
 //   student: load, save, create-upload, record-submission, submit-exercise, save-activity, set-checkin, logout
 //   admin:   admin-overview, admin-create-student, admin-unlock, admin-set-published, admin-file-url
 // Gates are PROGRESS-BASED and computed here: Week 1 is open; Week N+1 opens when every quiz of Week N is passed (70%+).
-// Level II (Weeks 5-8) additionally needs the Concept Brief submitted. No instructor action is required (admin-unlock is an optional override).
+// Part 2 (Weeks 5-8) additionally needs the Concept Brief submitted. No instructor action is required (admin-unlock is an optional override).
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
@@ -29,14 +29,14 @@ const FILE_ASSIGNMENTS: Record<string, { label: string; krp?: string }> = {
   w6d4: { label: "Business Plan" },
   w8d4: { label: "Operating Plan" },
 };
-// Quizzes per week (weeks 1-4 = Level I, 5-8 = Level II)
+// Quizzes per week (weeks 1-4 = Part 1, 5-8 = Part 2)
 const WEEK_QUIZZES: Record<number, string[]> = {
   1: ["w1d1", "w1d2", "w1d3", "w1d4"], 2: ["w2d1", "w2d2", "w2d3", "w2d4"], 3: ["w3d1", "w3d2", "w3d3", "w3d4"], 4: ["w4d1", "w4d2"],
   5: ["w5d1", "w5d2", "w5d3", "w5d4"], 6: ["w6d1", "w6d2", "w6d3", "w6d4"], 7: ["w7d1", "w7d2", "w7d3", "w7d4"], 8: ["w8d1", "w8d2", "w8d3", "w8d4"],
 };
 const QUIZ_IDS = Object.values(WEEK_QUIZZES).flat();
 const L1_QUIZ_IDS = [1, 2, 3, 4].flatMap((w) => WEEK_QUIZZES[w]);
-const FINAL_L1_QUIZ = "w4d2"; // "Level I Quiz 14": the 90-day check-in clock starts when this is first passed
+const FINAL_L1_QUIZ = "w4d2"; // "Part 1 Quiz 14": the 90-day check-in clock starts when this is first passed
 const CAPSTONE = "w4d3";       // Concept Brief
 // Week 1 scaling exercises: key -> [correct answer, tolerance]. Keep keys in sync with content/level1-exercises.js.
 const EXERCISES: Record<string, Record<string, [number, number]>> = {
@@ -153,7 +153,7 @@ function mergeQuizzes(cur: Record<string, any>, inc: unknown, published: string[
       };
       const c = out[k];
       if (!c || (rec.passed && !c.passed) || (rec.passed === !!c.passed && rec.score > c.score)) {
-        // `at` = when the quiz was first passed; the 90-day check-in counts from it (Level I final quiz)
+        // `at` = when the quiz was first passed; the 90-day check-in counts from it (Part 1 final quiz)
         const at = rec.passed ? (c?.passed && c.at ? c.at : new Date().toISOString()) : undefined;
         out[k] = at ? { ...rec, at } : rec;
       }

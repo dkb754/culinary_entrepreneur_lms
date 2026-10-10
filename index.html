@@ -1138,7 +1138,7 @@ body {
   box-shadow: 0 0 0 3px rgba(212,168,67,0.18);
 }
 .level-card.current::before {
-  content: 'YOUR PROGRAM';
+  content: 'YOUR LEVEL';
   position: absolute;
   top: 12px; right: 16px;
   font-family: var(--font-mono);
@@ -1245,6 +1245,12 @@ body {
   .level-name { font-size: 16px; }
 }
 
+/* locked levels */
+.level-card.locked { opacity: 1; cursor: default; background: #faf8f3; border-style: dashed; }
+.level-card.locked .level-name { color: var(--gray-600); }
+.level-includes { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: var(--gray-600); line-height: 1.55; }
+.level-unlock { margin-top: 8px; font-size: 13px; color: #8a6012; font-weight: 600; }
+
 /* ============================================================
    ENHANCEMENTS — submissions, progress states, a11y, mobile
    ============================================================ */
@@ -1317,7 +1323,7 @@ body {
   .sub-actions .btn-submit-work.big { width:100%; }
 }
 
-/* ===== Level I curriculum additions ===== */
+/* ===== Part 1 curriculum additions ===== */
 .layer-row{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:13px;color:var(--gray-600)}
 .layer-chip{display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.06em;padding:2px 8px;border-radius:99px;background:var(--gray-200);color:var(--gray-800)}
 .layer-chip.krp{background:var(--green-dark);color:var(--gold-light)}
@@ -1469,7 +1475,7 @@ body {
           <div class="grade-sub" id="add-student-status" role="status" aria-live="polite"></div></div>
         <div style="overflow-x:auto;background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-200);">
           <table class="tracker-table" id="admin-table">
-            <thead><tr><th>Student</th><th>Weeks open</th><th>Quizzes passed</th><th>Scaling exercises</th><th>Lesson activities</th><th>Deliverables</th><th>Open weeks through…</th><th>Level II</th></tr></thead>
+            <thead><tr><th>Student</th><th>Weeks open</th><th>Quizzes passed</th><th>Scaling exercises</th><th>Lesson activities</th><th>Deliverables</th><th>Open weeks through…</th><th>Part 2</th></tr></thead>
             <tbody id="admin-body"></tbody>
           </table>
         </div>
@@ -1492,6 +1498,7 @@ body {
   <span id="toast-msg">Saved!</span>
 </div>
 
+<script src="content/programs.js"></script>
 <script src="content/ibm-skillsbuild.js"></script>
 <script src="content/level1.js"></script>
 <script src="content/cst-level2.js"></script>
@@ -1542,7 +1549,7 @@ const FILES = Object.fromEntries(DAYS.filter(d => d.file).map(d => [d.id, { ...d
 const QUIZ_IDS = DAYS.filter(d => d.quiz).map(d => d.quiz);
 const WEEK_DEFS = LEVEL1.weeks;
 const weekDef = n => WEEK_DEFS.find(w => w.n === n);
-const weekLabel = n => (weekDef(n) && weekDef(n).level === 'L2') ? 'Level II · Week ' + (n - 4) : 'Week ' + n;
+const weekLabel = n => (weekDef(n) && weekDef(n).level === 'L2') ? 'Part 2 · Week ' + (n - 4) : 'Week ' + n;
 
 let sessionToken = null;
 let currentUser = null;
@@ -1630,7 +1637,7 @@ function writeLocal(name, d) {
 const fromServer = p => ({ ...EMPTY(), ...(p || {}) });
 
 // Quizzes and uploads are the only things a student produces. Everything else (which weeks are open,
-// KRP records, Level II readiness) is decided by the server and always wins.
+// KRP records, Part 2 readiness) is decided by the server and always wins.
 function mergeProgress(server, local) {
   const out = fromServer(server);
   out.quizzes = { ...out.quizzes }; out.deliverables = { ...out.deliverables }; // never mutate the server copy we compare against
@@ -1735,7 +1742,7 @@ function itemDone(it) {
 // ============================================================
 function renderSidebar() {
   let h = `<div class="sidebar-section"><div class="sidebar-heading">Navigation</div>
-    <div class="sidebar-item" data-page="programs" onclick="showPage('programs')"><div class="week-badge" style="background:var(--green-mid)">▦</div><span class="sidebar-item-label">All Programs</span></div>
+    <div class="sidebar-item" data-page="programs" onclick="showPage('programs')"><div class="week-badge" style="background:var(--green-mid)">▦</div><span class="sidebar-item-label">All Levels</span></div>
     <div class="sidebar-item active" data-page="dashboard" onclick="showPage('dashboard')"><div class="week-badge gold">⌂</div><span class="sidebar-item-label">Dashboard</span></div></div>`;
   LEVEL1.weeks.forEach(w => {
     h += `<div class="sidebar-section"><div class="sidebar-heading">${esc(weekLabel(w.n))}</div>
@@ -1754,43 +1761,34 @@ function renderSidebar() {
 }
 
 // ============================================================
-// RENDER: the four Culinary Coach programs (this course is the first)
+// RENDER: the four Culinary Coach levels (this course is Level 1; the others are paid and locked)
 // ============================================================
-const PROGRAMS = [
-  { id: 'cst', name: 'Culinary Systems Training', tag: 'Self-Paced · Online', tagClass: 'tag-async', icon: '🍳', iconClass: 'green', current: true,
-    desc: 'Where you are now. Kitchen systems, workplace habits, food safety, and costing, at your own pace. Finish Level I and Level II opens automatically.',
-    ibm: 'IBM SkillsBuild opens after you pass every Week 2 quiz.', page: 'dashboard' },
-  { id: 'ce1', name: 'Culinary Entrepreneurship I', tag: 'In-Person Cohort', tagClass: 'tag-cohort', icon: '📋', iconClass: 'gold',
-    desc: 'Four weeks of kitchen readiness, costing, menus, and your Concept Brief, taught in person with Chef Duane.',
-    ibm: 'IBM SkillsBuild Pathway 3 is open from Day 1.' },
-  { id: 'l3', name: 'Frontline Supervisor Development', tag: 'Employer-Sponsored', tagClass: 'tag-employ', icon: '👥', iconClass: 'blue',
-    desc: 'Leading a team, kitchen communication, and shift management for working cooks and new supervisors.',
-    ibm: 'IBM SkillsBuild Pathway 2, with Agile Explorer first.' },
-  { id: 'l4', name: 'Culinary Entrepreneurship II', tag: 'Cohort · Application & Launch', tagClass: 'tag-adv', icon: '🚀', iconClass: 'orange',
-    desc: 'Business planning, financial projections, and a live pitch for graduates of Culinary Entrepreneurship I.',
-    ibm: 'IBM SkillsBuild: Pathway 3 plus Agile Explorer and Data Driven Decision Making.' },
-];
-
+const OPEN_LEVEL = 'L1';
 function renderPrograms() {
   const pct = (document.getElementById('global-pct') || {}).textContent || '0%';
-  const cards = PROGRAMS.map(p => `<div class="level-card ${p.current ? 'unlocked current' : ''}" ${p.current ? `onclick="showPage('${p.page}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')this.click()"` : ''}>
+  const cards = window.CC_LEVELS.map(p => {
+    const open = p.id === OPEN_LEVEL;
+    const list = `<ul class="level-includes">${p.includes.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+    return `<div class="level-card ${open ? 'unlocked current' : 'locked'}" ${open ? `onclick="showPage('dashboard')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')this.click()"` : 'aria-disabled="true"'}>
       <div class="level-icon ${p.iconClass}">${p.icon}</div>
       <div class="level-info">
+        <div class="level-num">${esc(p.num)}</div>
         <div class="level-name">${esc(p.name)}</div>
         <span class="level-tag ${p.tagClass}">${esc(p.tag)}</span>
         <div class="level-desc">${esc(p.desc)}</div>
-        <div class="level-desc" style="margin-top:6px;color:#1a3a7a">${esc(p.ibm)}</div>
-        ${p.current ? `<div class="level-progress-bar" title="Your progress ${esc(pct)}"><div class="level-progress-fill" style="width:${esc(pct)}"></div></div>`
-          : `<div class="level-desc" style="margin-top:6px"><strong>Questions about this program?</strong> Contact ${CONTACT}</div>`}
+        ${list}
+        ${open ? `<div class="level-progress-bar" title="Your progress ${esc(pct)}"><div class="level-progress-fill" style="width:${esc(pct)}"></div></div>`
+          : `<div class="level-unlock">🔒 This level is part of a paid program. To enroll, contact ${CONTACT}</div>`}
       </div>
-      ${p.current ? '<div class="level-arrow">›</div>' : ''}
-    </div>`).join('');
+      ${open ? '<div class="level-arrow">›</div>' : '<div class="level-lock">🔒</div>'}
+    </div>`;
+  }).join('');
   document.getElementById('page-programs').innerHTML = `
     <div class="level-hub">
       <div class="level-hub-header">
         <div class="eyebrow">Culinary Coach LLC</div>
         <h2 id="hub-greeting">Welcome back${currentUser && !isAdmin ? ', ' + esc(currentUser.split(' ')[0]) : ''}!</h2>
-        <p>These are the Culinary Coach programs. You are in Culinary Systems Training. Open it to see your weeks and quizzes.</p>
+        <p>Culinary Coach has four levels. You are in Level 1. Open it to see your weeks and quizzes. You can see what is in each paid level below.</p>
       </div>
       <div class="level-cards">${cards}</div>
     </div>`;
@@ -1805,7 +1803,7 @@ function renderDashboard() {
   document.getElementById('page-dashboard').innerHTML = `
     <div class="dash-header"><div class="eyebrow">Culinary Coach LLC</div><h2 id="dash-greeting">Welcome back!</h2>
       <p>Work at your own pace, online. Pass every quiz in a week (70% or higher) to open the next week. You are on <strong id="cur-week">Week 1</strong>.</p></div>
-    <div class="l2-banner" id="l2-banner" style="display:none">🎓 <div><strong>You're ready for Level II.</strong> You passed every Level I quiz and submitted your Concept Brief. Level II (business planning) is open now. <button class="link-btn" onclick="showPage('w5')">Start Level II</button></div></div>
+    <div class="l2-banner" id="l2-banner" style="display:none">🎓 <div><strong>You're ready for Part 2.</strong> You passed every Part 1 quiz and submitted your Concept Brief. Part 2 (business planning) is open now. <button class="link-btn" onclick="showPage('w5')">Start Part 2</button></div></div>
     <div class="l2-banner" id="ibm-banner" style="display:none">🎖️ <div><strong>You have earned premium access to IBM SkillsBuild.</strong> Register with the link on the IBM SkillsBuild page, then start your first course. <button class="link-btn" onclick="showPage('ibm')">Open IBM SkillsBuild</button></div></div>
     <div class="stats-row">
       <div class="stat-card"><div class="stat-value" id="stat-week">1</div><div class="stat-label">Current Week</div></div>
@@ -1871,7 +1869,7 @@ function menuExampleHtml() {
 function renderWeeks() {
   LEVEL1.weeks.forEach(w => {
     document.getElementById('page-w' + w.n).innerHTML = `
-      <div class="week-header"><div class="wh-eyebrow">${esc(weekLabel(w.n))}${w.level === 'L2' ? '' : ' · Level I'}</div><h2>${esc(w.title)}</h2><div class="wh-dates">${esc(w.note)}</div></div>
+      <div class="week-header"><div class="wh-eyebrow">${esc(weekLabel(w.n))}${w.level === 'L2' ? '' : ' · Part 1'}</div><h2>${esc(w.title)}</h2><div class="wh-dates">${esc(w.note)}</div></div>
       <div class="day-list">${DAYS.filter(d => d.week === w.n).map(renderDayCard).join('')}</div>`;
   });
 }
@@ -1881,13 +1879,13 @@ function renderKrp() {
     <div class="krp-weeks">${esc(p.weeks)}</div><p>${esc(p.focus)}</p><div class="krp-out">${esc(p.out)}</div></div>`).join('');
   document.getElementById('page-krp').innerHTML = `
     <div class="week-header"><div class="wh-eyebrow">Kitchen Readiness Protocol</div><h2>My KRP Portfolio</h2>
-      <div class="wh-dates">Built across Level I · finished with a 90-day check-in after you pass the final Level I quiz</div></div>
+      <div class="wh-dates">Built across Part 1 · finished with a 90-day check-in after you pass the final Part 1 quiz</div></div>
     <div class="krp-phases">${phases}</div>
     <div class="section-title">Your four KRP skills</div>
     <div class="krp-skills">${(LEVEL1.krp.skills || []).map(k => `<div class="krp-skill"><h4>${esc(k.name)}</h4><div class="krp-weeks">${esc(k.when)}</div><p>${esc(k.desc)}</p><button class="link-btn" onclick="goToDay('${k.day}')">Go to this lesson</button></div>`).join('')}</div>
     <div class="section-title">Portfolio deliverables</div><div id="krp-items" class="krp-items"></div>
     <div class="deliverable-card" id="checkin-card"><h4>📬 90-day check-in <span class="layer-chip">optional</span></h4>
-      <p>Opt in and we will email you once, 90 days after you pass the final Level I quiz (Quiz 14), with a short survey about how things are going. We use your email for nothing else, and you can opt out here any time.</p>
+      <p>Opt in and we will email you once, 90 days after you pass the final Part 1 quiz (Quiz 14), with a short survey about how things are going. We use your email for nothing else, and you can opt out here any time.</p>
       <label for="checkin-email" class="sr-only">Your email address</label>
       <input type="email" id="checkin-email" class="checkin-input" placeholder="you@example.com" autocomplete="email" maxlength="254">
       <label class="checkin-opt"><input type="checkbox" id="checkin-opt"> Yes, email me the 90-day check-in</label>
@@ -1951,7 +1949,7 @@ function renderShell() {
 // NAVIGATION
 // ============================================================
 function gateMessage(n) {
-  if (n === 5) return 'Level II opens when you pass every Level I quiz (70% or higher) <strong>and</strong> submit your Concept Brief.';
+  if (n === 5) return 'Part 2 opens when you pass every Part 1 quiz (70% or higher) <strong>and</strong> submit your Concept Brief.';
   return `${esc(weekLabel(n))} opens when you pass every quiz in ${esc(weekLabel(n - 1))} (70% or higher).`;
 }
 
@@ -1967,8 +1965,8 @@ function renderIbm() {
       <p style="margin-bottom:12px">Register first. Use this link so your account is connected to Culinary Coach.</p>
       <a class="btn-submit-work" style="display:inline-block;text-decoration:none" href="${esc(D.register.url)}" target="_blank" rel="noopener">${esc(D.register.title)}</a></div>
     <div style="background:#fff;border:1px solid #e3ddd0;border-radius:10px;padding:18px 20px"><h3 style="margin-bottom:8px">Step 2: Start a course</h3>
-      <p style="margin-bottom:8px">Start with any of these three. All courses are self-paced, so you pick the time.</p>
-      <ul style="padding-left:22px;line-height:1.9">${D.pathway1.map(ibmLink).join('')}</ul></div>`;
+      <p style="margin-bottom:8px">These are your Level 1 courses. Start with any of these three. All courses are self-paced, so you pick the time.</p>
+      <ul style="padding-left:22px;line-height:1.9">${D.level1.map(ibmLink).join('')}</ul></div>`;
   let seen = false; try { seen = localStorage.getItem('cst_async_ibm_seen') === '1'; } catch (e) {}
   if (!seen && !isAdmin) {
     try { localStorage.setItem('cst_async_ibm_seen', '1'); } catch (e) {}
@@ -2398,7 +2396,7 @@ function updateProgress() {
     if (!locked) currentWeek = w; // the furthest week the learner has opened
 
     document.getElementById('wc' + w + '-bar').style.width = (items.length ? Math.round(d / items.length * 100) : 0) + '%';
-    document.getElementById('wc' + w + '-count').textContent = locked ? (w === 5 ? 'Opens after Level I is done' : 'Opens after you pass ' + weekLabel(w - 1) + ' quizzes') : d + ' of ' + items.length + ' items done';
+    document.getElementById('wc' + w + '-count').textContent = locked ? (w === 5 ? 'Opens after Part 1 is done' : 'Opens after you pass ' + weekLabel(w - 1) + ' quizzes') : d + ' of ' + items.length + ' items done';
     const chip = document.getElementById('wc' + w + '-status');
     const state = locked ? ['status-locked', '🔒 Locked'] : complete ? ['status-complete', '✓ Complete'] : d > 0 ? ['status-active', 'In progress'] : ['status-todo', 'Open'];
     chip.className = 'wc-status ' + state[0];
@@ -2440,7 +2438,7 @@ function updateProgress() {
   document.getElementById('global-label').textContent = 'Course Progress · ' + passed + ' quizzes passed · ' + filed + ' deliverables submitted';
 
   const lastOpen = currentWeek || 1;
-  document.getElementById('stat-week').textContent = weekLabel(lastOpen).replace('Level II · Week ', 'II·');
+  document.getElementById('stat-week').textContent = weekLabel(lastOpen).replace('Part 2 · Week ', 'II·');
   const cw = document.getElementById('cur-week'); if (cw) cw.textContent = weekLabel(lastOpen);
   document.getElementById('stat-quizzes').textContent = passed + '/' + open.length;
   document.getElementById('stat-deliverables').textContent = filed + '/' + fileIds.length;
@@ -2603,7 +2601,7 @@ async function buildQuizReview() {
       ${qs}</details>`;
   }).join('');
   page.innerHTML = `<div class="week-header"><div class="wh-eyebrow">Instructor</div><h2>Quiz Review</h2>
-    <div class="wh-dates">${pub.length} of ${QUIZ_IDS.length} published · Level II quizzes are drafts: read every question and answer before you publish them</div></div>${cards}`;
+    <div class="wh-dates">${pub.length} of ${QUIZ_IDS.length} published · Part 2 quizzes are drafts: read every question and answer before you publish them</div></div>${cards}`;
 }
 
 async function adminTogglePublish(id) {
@@ -2652,7 +2650,7 @@ async function exportCSV() {
   try { await loadAdminData(); } catch (e) { return; }
   const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
   const open = QUIZ_IDS.filter(id => (settings.published_quizzes || []).includes(id));
-  let csv = ['Student', 'Weeks open', 'Quizzes passed', 'Scaling exercises', 'Lesson activities', 'Deliverables', 'Level II ready', '90-day check-in opt-in', 'Check-in email'].join(',') + '\n';
+  let csv = ['Student', 'Weeks open', 'Quizzes passed', 'Scaling exercises', 'Lesson activities', 'Deliverables', 'Part 2 ready', '90-day check-in opt-in', 'Check-in email'].join(',') + '\n';
   adminData.roster.forEach(name => {
     const d = adminProg(name);
     csv += [name, (d.unlocked_weeks || [1]).length, `${open.filter(id => d.quizzes[id]?.passed).length}/${open.length}`,

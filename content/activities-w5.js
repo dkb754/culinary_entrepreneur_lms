@@ -1,4 +1,4 @@
-/* Level II · Week 1 (w5d1 to w5d4): concept, market, structure and the plan outline. DRAFT. */
+/* Part 2 · Week 1 (w5d1 to w5d4): concept, market, structure and the plan outline. DRAFT. */
 ACTIVITIES.w5d1 = {
   p1: [
     {

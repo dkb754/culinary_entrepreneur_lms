@@ -1,7 +1,7 @@
-/* Culinary Systems Training — Self-Paced (cst-async). Level I (weeks 1–4) + Level II (weeks 5–8). DATA ONLY.
- * No dates, no labs: progress-based. Level II days/weeks are appended by content/cst-level2.js.
+/* Culinary Systems Training — Self-Paced (cst-async). Part 1 (weeks 1–4) + Part 2 (weeks 5–8). DATA ONLY.
+ * No dates, no labs: progress-based. Part 2 days/weeks are appended by content/cst-level2.js.
  *
- *   id        w{week}d{day}; weeks 1–4 are Level I, weeks 5–8 are Level II (week 5 = "Level II · Week 1").
+ *   id        w{week}d{day}; weeks 1–4 are Part 1, weeks 5–8 are Part 2 (week 5 = "Part 2 · Week 1").
  *   topics    short outline shown above the lesson text
  *   quiz      id of the quiz in QUIZ_BANK (level1-quizzes.js / cst-l2-quizzes-*.js), or null
  *   file      a student upload: { label, blurb, due }  (server: FILE_ASSIGNMENTS)
@@ -12,14 +12,14 @@ const YT = id => 'https://www.youtube.com/watch?v=' + id;
 const LEVEL1 = {
   title: 'Culinary Systems Training — Self-Paced',
   levels: [
-    { id: 'L1', name: 'Level I', title: 'Level I · CST Module 1', weeks: [1, 2, 3, 4] },
-    { id: 'L2', name: 'Level II', title: 'Level II · Business Planning', weeks: [5, 6, 7, 8] },
+    { id: 'L1', name: 'Part 1', title: 'Part 1 · CST Module 1', weeks: [1, 2, 3, 4] },
+    { id: 'L2', name: 'Part 2', title: 'Part 2 · Business Planning', weeks: [5, 6, 7, 8] },
   ],
   weeks: [
     { n: 1, title: 'Kitchen Readiness & Systems', side: 'Kitchen Readiness & Systems', sub: 'Mise en place, knife skills, recipes, storage and kitchen communication', note: 'About 3 hours a day, 4 days. Pass every Week 1 quiz (70%+) to unlock Week 2.' },
     { n: 2, title: 'Food Safety', side: 'Food Safety', sub: 'Foodborne illness, hygiene, time and temperature, cleaning and sanitizing', note: 'About 3 hours a day, 4 days. Pass every Week 2 quiz to unlock Week 3.' },
     { n: 3, title: 'Costing, Pricing, Menu & Business Formats', side: 'Costing, Menu & Formats', sub: 'The numbers and the shape of a food business', note: 'About 3 hours a day, 4 days. Pass every Week 3 quiz to unlock Week 4.' },
-    { n: 4, title: 'Permits, Food Safety Review & Capstone', side: 'Permits & Capstone', sub: 'Licensing, a final review and your Concept Brief', note: 'Finish Level I: pass both quizzes and submit your Concept Brief to unlock Level II.' },
+    { n: 4, title: 'Permits, Food Safety Review & Capstone', side: 'Permits & Capstone', sub: 'Licensing, a final review and your Concept Brief', note: 'Finish Part 1: pass both quizzes and submit your Concept Brief to unlock Part 2.' },
   ],
 
   days: [
@@ -192,8 +192,8 @@ const LEVEL1 = {
       resources: [],
       quiz: null,
       file: {
-        label: 'Concept Brief', due: 'End of Week 4', krp: 'Level I capstone',
-        blurb: 'Your Concept Brief: business name, product or service, format, customer, pricing and your next step. Build it in the Capstone lesson, download it, improve it, and upload it here. Submitting it (with every Level I quiz passed) unlocks Level II.',
+        label: 'Concept Brief', due: 'End of Week 4', krp: 'Part 1 capstone',
+        blurb: 'Your Concept Brief: business name, product or service, format, customer, pricing and your next step. Build it in the Capstone lesson, download it, improve it, and upload it here. Submitting it (with every Part 1 quiz passed) unlocks Part 2.',
       },
     },
     {
@@ -213,15 +213,15 @@ const LEVEL1 = {
   krp: {
     // The four Phase 2 skills, in plain language (student-facing)
     skills: [
-      { name: 'Know Your Warning Signs', when: 'Level I · Week 2', day: 'w2d1', desc: 'Learn to spot when stress is building before it takes you out. You’ll identify your own signals — physical, mental, and emotional — so you can catch problems early.' },
-      { name: 'Change How You See Pressure', when: 'Level I · Week 3', day: 'w3d1', desc: 'Hard moments in the kitchen are part of the job, not a sign you don’t belong. This skill teaches you to reframe high-pressure situations as performance conditions you can handle.' },
-      { name: 'Build Your People', when: 'Level I · Week 3', day: 'w3d3', desc: 'No successful food business runs alone. You’ll identify the people in your corner — mentors, peers, customers — and learn how to lean on that network when things get tough.' },
-      { name: 'Recharge So You Can Keep Going', when: 'Level I · Week 4', day: 'w4d1', desc: 'Burnout is real in this industry. This skill is about knowing how to recover between shifts and seasons so you stay in the game long-term.' },
+      { name: 'Know Your Warning Signs', when: 'Part 1 · Week 2', day: 'w2d1', desc: 'Learn to spot when stress is building before it takes you out. You’ll identify your own signals — physical, mental, and emotional — so you can catch problems early.' },
+      { name: 'Change How You See Pressure', when: 'Part 1 · Week 3', day: 'w3d1', desc: 'Hard moments in the kitchen are part of the job, not a sign you don’t belong. This skill teaches you to reframe high-pressure situations as performance conditions you can handle.' },
+      { name: 'Build Your People', when: 'Part 1 · Week 3', day: 'w3d3', desc: 'No successful food business runs alone. You’ll identify the people in your corner — mentors, peers, customers — and learn how to lean on that network when things get tough.' },
+      { name: 'Recharge So You Can Keep Going', when: 'Part 1 · Week 4', day: 'w4d1', desc: 'Burnout is real in this industry. This skill is about knowing how to recover between shifts and seasons so you stay in the game long-term.' },
     ],
     phases: [
-      { n: 1, name: 'Conceptualization', weeks: 'Level I · Weeks 1–2', focus: 'Build accurate expectations and a professional identity.', out: 'Honest Map (Week 1) · Professional Identity Statement (Week 2)' },
-      { n: 2, name: 'Skill Acquisition', weeks: 'Level I · Weeks 3–4', focus: 'Four skills for handling pressure, taught alongside your food training.', out: 'Know Your Warning Signs (Week 2) · Change How You See Pressure (Week 3) · Build Your People (Week 3) · Recharge So You Can Keep Going (Week 4)' },
-      { n: 3, name: 'Application', weeks: 'Level I · Week 4 and after', focus: 'Your 90-day plan and first-shift preparation.', out: 'KRP Portfolio · a 90-day check-in email after you pass the Level I final quiz' },
+      { n: 1, name: 'Conceptualization', weeks: 'Part 1 · Weeks 1–2', focus: 'Build accurate expectations and a professional identity.', out: 'Honest Map (Week 1) · Professional Identity Statement (Week 2)' },
+      { n: 2, name: 'Skill Acquisition', weeks: 'Part 1 · Weeks 3–4', focus: 'Four skills for handling pressure, taught alongside your food training.', out: 'Know Your Warning Signs (Week 2) · Change How You See Pressure (Week 3) · Build Your People (Week 3) · Recharge So You Can Keep Going (Week 4)' },
+      { n: 3, name: 'Application', weeks: 'Part 1 · Week 4 and after', focus: 'Your 90-day plan and first-shift preparation.', out: 'KRP Portfolio · a 90-day check-in email after you pass the Part 1 final quiz' },
     ],
     items: [
       { key: 'honest_map', label: 'Honest Map', day: 'w1d4', due: 'End of Week 1' },

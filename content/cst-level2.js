@@ -1,11 +1,11 @@
-/* Level II — Business Planning (weeks 5–8 of the self-paced course). DATA ONLY: day outline, quiz ids and deliverables.
+/* Part 2 — Business Planning (weeks 5–8 of the self-paced course). DATA ONLY: day outline, quiz ids and deliverables.
  * Lesson text lives in cst-l2-lessons-w5..w8.js, practice in activities-w5..w8.js, quizzes in cst-l2-quizzes-w5..w8.js.
- * Ids follow Level I: w{week}d{day}; week 5 is shown to students as "Level II · Week 1". Every day has a quiz with the same id. */
+ * Ids follow Part 1: w{week}d{day}; week 5 is shown to students as "Part 2 · Week 1". Every day has a quiz with the same id. */
 LEVEL1.weeks.push(
   { n: 5, level: 'L2', title: 'Business Planning Foundations', side: 'Business Planning', sub: 'Your concept, your market, your structure and your plan outline', note: 'About 3 hours a day, 4 days. Pass every quiz in the week (70%+) to unlock the next week.' },
   { n: 6, level: 'L2', title: 'Financials', side: 'Financials', sub: 'Startup costs, pricing, break-even and cash flow', note: 'Finish the week by submitting your Business Plan.' },
   { n: 7, level: 'L2', title: 'Operations', side: 'Operations', sub: 'Production, suppliers, people, quality and safety systems', note: 'About 3 hours a day, 4 days.' },
-  { n: 8, level: 'L2', title: 'Marketing, Pitch & Operating Plan', side: 'Marketing & Pitch', sub: 'Brand, marketing, sales, your pitch and your Operating Plan', note: 'Finish Level II by submitting your Operating Plan.' },
+  { n: 8, level: 'L2', title: 'Marketing, Pitch & Operating Plan', side: 'Marketing & Pitch', sub: 'Brand, marketing, sales, your pitch and your Operating Plan', note: 'Finish Part 2 by submitting your Operating Plan.' },
 );
 
 LEVEL1.days.push(
@@ -28,7 +28,7 @@ LEVEL1.days.push(
     topics: ['A simple monthly sales forecast', 'Slow and busy seasons', 'Profit vs cash: why they are different', 'A 12-month cash plan'], resources: [], quiz: 'w6d3' },
   { id: 'w6d4', week: 6, module: 'Financial Review & Your Business Plan', layer: '', hours: '~3 hours',
     topics: ['Putting your numbers together', 'Sanity checks for a financial plan', 'Common money mistakes', 'Finishing and submitting your Business Plan'], resources: [], quiz: 'w6d4',
-    file: { label: 'Business Plan', due: 'End of Level II Week 2', blurb: 'Your Business Plan: summary, concept, market, menu and pricing, marketing, operations, financial plan, and risks and next steps. Build the sections in this week’s lessons, download them, put them together in one document, and upload it here.' } },
+    file: { label: 'Business Plan', due: 'End of Part 2 Week 2', blurb: 'Your Business Plan: summary, concept, market, menu and pricing, marketing, operations, financial plan, and risks and next steps. Build the sections in this week’s lessons, download them, put them together in one document, and upload it here.' } },
 
   // ---------------- LEVEL II · WEEK 3 (week 7) ----------------
   { id: 'w7d1', week: 7, module: 'Production Systems & Capacity', layer: '', hours: '~3 hours',
@@ -49,5 +49,5 @@ LEVEL1.days.push(
     topics: ['Selling face to face and online', 'Customer service and repeat customers', 'Reviews and feedback', 'Growing without losing quality'], resources: [], quiz: 'w8d3' },
   { id: 'w8d4', week: 8, module: 'Your Pitch & Operating Plan', layer: '', hours: '~3 hours',
     topics: ['A 60-second pitch', 'Answering common questions', 'Pulling your operations into one Operating Plan', 'Your first 90 days'], resources: [], quiz: 'w8d4',
-    file: { label: 'Operating Plan', due: 'End of Level II', blurb: 'Your Operating Plan: production workflow and capacity, suppliers and ordering, schedule and roles, quality checklists, food safety and compliance plan, and your launch plan with your first 90 days. Build it in this week’s lessons, download it, improve it, and upload it here.' } },
+    file: { label: 'Operating Plan', due: 'End of Part 2', blurb: 'Your Operating Plan: production workflow and capacity, suppliers and ordering, schedule and roles, quality checklists, food safety and compliance plan, and your launch plan with your first 90 days. Build it in this week’s lessons, download it, improve it, and upload it here.' } },
 );

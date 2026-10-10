@@ -1,4 +1,4 @@
-/* Week 7 (w7d1 to w7d4): Level II · Week 3, Operations. Practice numbers are examples only. */
+/* Week 7 (w7d1 to w7d4): Part 2 · Week 3, Operations. Practice numbers are examples only. */
 
 /* ---- Day 1: production, capacity, batching, equipment ------------------------------------------------------------- */
 ACTIVITIES.w7d1 = {
