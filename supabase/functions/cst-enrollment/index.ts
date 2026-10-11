@@ -1,5 +1,8 @@
 // POST /functions/v1/cst-enrollment   { name, email, source: "culinarycoach" | "redshirtops" }
-//   -> { success: true, code: "CST-2026-X7K2M9" }   (a repeat or opted-out e-mail returns { success: true } with no code and no e-mail)
+//   -> { success: true, emails: { applicant: "sent"|"failed"|"not_configured", notice: ... } }
+//   The access code is never echoed back in the response — only e-mailed to the address given. This keeps a public
+//   form from being used to harvest codes for e-mail addresses the caller doesn't control, or to generate codes for
+//   addresses that will never read the welcome e-mail. (A repeat or opted-out e-mail returns { success: true } with no e-mail sent.)
 // GET  /functions/v1/cst-enrollment?u=<token>      one-click unsubscribe (also accepts POST for e-mail clients' List-Unsubscribe-Post)
 //
 // Creates a self-paced CST access code, stores it hashed (like every other code), then sends two e-mails in parallel
@@ -206,7 +209,7 @@ Deno.serve(async (req) => {
       }),
       sendMail({ from: FROM_NOTICE, to: [DUANE], subject: n.subject, text: n.text, html: n.html }),
     ]);
-    return reply(req, 200, { success: true, code, emails: { applicant, notice } });
+    return reply(req, 200, { success: true, emails: { applicant, notice } });
   } catch (e) {
     console.error("cst-enrollment error", e);
     return reply(req, 500, { success: false, error: "server_error" });

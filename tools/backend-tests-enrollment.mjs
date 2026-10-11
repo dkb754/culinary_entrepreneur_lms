@@ -25,6 +25,13 @@ const reset = () => fetch(`${MOCK}/reset`, { method: 'POST' });
 async function t(name, fn) { try { await fn(); } catch (e) { ok(false, `${name}: unexpected error`, String(e && e.stack || e).split('\n').slice(0, 3).join(' | ')); } }
 const year = new Date().getUTCFullYear();
 const rowFor = email => jsonQ(`select * from public.student_access_codes where lower(email) = lower('${email}')`)[0];
+// The API response never carries the code (security fix: a public form must not be usable to harvest codes for
+// addresses the caller doesn't control). The only place a plaintext code exists is the applicant e-mail, so tests
+// that need it — same as a real learner — read it out of the captured mail.
+const codeFromMail = (sent, email) => {
+  const m = sent.find(x => (x.to || []).some(t => t.toLowerCase() === email.toLowerCase()));
+  return /Your Access Code: (CST-\d{4}-[A-HJ-NP-Z2-9]{6})/.exec(m?.text || '')?.[1] || null;
+};
 
 R.section('Form submission creates an enrollment');
 await t('create', async () => {
@@ -33,14 +40,12 @@ await t('create', async () => {
   const progressBefore = sql(`select count(*) from public.student_progress`);
   const r = await enroll({ name: 'Maya Brooks', email: 'Maya.Brooks@example.com', source: 'culinarycoach' });
   ok(r.status === 200 && r.body.success === true, 'a valid submission returns 200 and success:true', JSON.stringify(r));
-  ok(new RegExp(`^CST-${year}-[A-HJ-NP-Z2-9]{6}$`).test(r.body.code || ''), `the code looks like CST-${year}-XXXXXX`, r.body.code);
+  ok(!('code' in (r.body || {})), 'the response never carries the plaintext code (only the e-mail does)', JSON.stringify(r));
   const row = rowFor('maya.brooks@example.com');
   ok(!!row, 'a row was inserted into student_access_codes');
   eq([row.student_name, row.level, row.is_admin, row.source, row.opted_out], ['Maya Brooks', 'cst-async', false, 'culinarycoach', false], 'the row has the right name, level, source and flags');
   ok(!!row.enrolled_at && !!row.unsub_token, 'enrolled_at and an unsubscribe token are set');
-  ok(row.access_code_hash && !row.access_code_hash.includes(r.body.code) && row.access_code_hash.startsWith('$2'), 'the code is stored as a bcrypt hash, never in plain text');
-  const login = await fetch(`${API}/functions/v1/validate-login`, { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': freshIp() }, body: JSON.stringify({ access_code: r.body.code }) }).then(x => x.json());
-  ok(login.valid === true && login.level === 'cst-async' && login.student_name === 'Maya Brooks', 'the new code signs in to the self-paced course', JSON.stringify(login));
+  ok(row.access_code_hash && row.access_code_hash.startsWith('$2'), 'the code is stored as a bcrypt hash, never in plain text');
   eq(sql(`select count(*) from public.student_access_codes where level <> 'cst-async'`), cohortBefore, 'no cohort access codes were touched');
   eq(sql(`select count(*) from public.student_progress`), progressBefore, 'no student_progress rows were created or changed');
 
@@ -53,15 +58,19 @@ await t('create', async () => {
   ok(a.auth === 'Bearer ci-test-key', 'the Resend API key is sent as a bearer token');
   eq(a.from, 'Chef Duane Brown <duane@culinarycoach.org>', 'applicant e-mail is from Chef Duane Brown');
   eq(a.subject, 'Your Premium Access to Culinary Systems Training — From Chef Duane', 'applicant subject says premium access');
-  ok(a.text.includes('Hi Maya,') && a.text.includes('Your Name: Maya Brooks') && a.text.includes(`Your Access Code: ${r.body.code}`), 'applicant e-mail has the name and the access code');
+  const code = codeFromMail(sent, 'Maya.Brooks@example.com');
+  ok(new RegExp(`^CST-${year}-[A-HJ-NP-Z2-9]{6}$`).test(code || ''), `the e-mail carries a code that looks like CST-${year}-XXXXXX`, code);
+  ok(a.text.includes('Hi Maya,') && a.text.includes('Your Name: Maya Brooks'), 'applicant e-mail has the name', a.text);
   ok(a.text.includes('https://cst-async.netlify.app/') && a.text.includes('(804) 219-8211') && a.text.includes('Week 1 unlocks immediately'), 'applicant e-mail has the platform link, phone number and Week 1 line');
-  ok(a.html.includes(r.body.code) && a.reply_to === 'duane@culinarycoach.org', 'HTML version carries the code, and replies go to Duane');
+  ok(a.html.includes(code) && a.reply_to === 'duane@culinarycoach.org', 'HTML version carries the code, and replies go to Duane');
+  const login = await fetch(`${API}/functions/v1/validate-login`, { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': freshIp() }, body: JSON.stringify({ access_code: code }) }).then(x => x.json());
+  ok(login.valid === true && login.level === 'cst-async' && login.student_name === 'Maya Brooks', 'the code from the e-mail signs in to the self-paced course', JSON.stringify(login));
   const link = /(https?:\/\/[^\s<>"]+\?u=[0-9a-f]{48})/.exec(a.text);
   ok(!!link && link[1].endsWith(row.unsub_token), 'the e-mail carries a one-click unsubscribe link with the learner\'s token');
   ok((a.headers || {})['List-Unsubscribe']?.includes(row.unsub_token) && (a.headers || {})['List-Unsubscribe-Post'] === 'List-Unsubscribe=One-Click', 'List-Unsubscribe headers are set for one-click opt-out in mail apps');
   eq(n.from, 'noreply@culinarycoach.org', 'Duane\'s notice is from noreply@culinarycoach.org');
   eq(n.subject, 'New CST Enrollment — Maya Brooks', 'Duane\'s notice subject names the applicant');
-  ok(['Name: Maya Brooks', 'Email: maya.brooks@example.com', 'Source: culinarycoach.org', `Code issued: ${r.body.code}`, 'Time: '].every(l => n.text.includes(l)), 'Duane\'s notice lists name, e-mail, source, code and time');
+  ok(['Name: Maya Brooks', 'Email: maya.brooks@example.com', 'Source: culinarycoach.org', `Code issued: ${code}`, 'Time: '].every(l => n.text.includes(l)), 'Duane\'s notice lists name, e-mail, source, code and time');
   const IBM = 'https://skills.yourlearning.ibm.com/?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach';
   ok(a.text.includes(IBM) && a.html.includes('Register for IBM SkillsBuild') && a.html.includes(IBM.replace(/&/g, '&amp;')), 'learner e-mail carries the IBM SkillsBuild block and registration link');
   ok(a.text.indexOf('IBM SkillsBuild') < a.text.indexOf('Chef Duane Brown\nCulinary Coach LLC'), 'the IBM block comes before the sign-off');
@@ -87,7 +96,7 @@ await t('validation', async () => {
   eq(sql(`select count(*) from public.student_access_codes where lower(email) in ('a@b.co','p@example.com','q@example.com')`), '0', 'rejected submissions create nothing');
   await reset();
   const bot = await enroll({ name: 'Bot Person', email: 'bot@example.com', source: 'culinarycoach', website: 'http://spam.example' });
-  ok(bot.status === 200 && !bot.body.code && !rowFor('bot@example.com') && (await mail()).length === 0, 'a filled honeypot field looks successful but creates nothing and sends nothing');
+  ok(bot.status === 200 && !('code' in (bot.body || {})) && !rowFor('bot@example.com') && (await mail()).length === 0, 'a filled honeypot field looks successful but creates nothing and sends nothing');
   // Browser-permission policy, checked on the real POST answer (the local test stack answers the OPTIONS preflight itself)
   const good = await enroll({ name: 'Cors Good', email: 'cors.good@example.com', source: 'culinarycoach' }, freshIp(), { origin: 'https://culinarycoach.org' });
   eq(good.status, 200, 'a submission from the culinarycoach.org form is accepted');
@@ -99,26 +108,33 @@ R.section('Repeat submissions and name clashes');
 await t('dedupe', async () => {
   await reset();
   const first = await enroll({ name: 'Tia Moore', email: 'tia.moore@example.com', source: 'culinarycoach' });
-  await wait(300); await reset();
+  await wait(300);
+  const firstCode = codeFromMail(await mail(), 'tia.moore@example.com');
+  ok(!!firstCode, 'the first submission e-mails a code');
+  await reset();
   const again = await enroll({ name: 'Tia Moore', email: 'TIA.MOORE@example.com', source: 'redshirtops' });
-  ok(again.status === 200 && again.body.success === true && !again.body.code, 'the same e-mail again returns success without a second code');
+  ok(again.status === 200 && again.body.success === true && !('code' in (again.body || {})), 'the same e-mail again returns success without a second code');
   eq(sql(`select count(*) from public.student_access_codes where lower(email) = 'tia.moore@example.com'`), '1', 'still one row for that e-mail');
   await wait(300);
   eq((await mail()).length, 0, 'no e-mail is sent for a repeat submission');
-  const login = await fetch(`${API}/functions/v1/validate-login`, { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': freshIp() }, body: JSON.stringify({ access_code: first.body.code }) }).then(x => x.json());
+  const login = await fetch(`${API}/functions/v1/validate-login`, { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': freshIp() }, body: JSON.stringify({ access_code: firstCode }) }).then(x => x.json());
   ok(login.valid === true, 'the first code still works after the repeat submission');
 
   await reset();
   const c = await enroll({ name: 'CI Student A', email: 'ci.a.twin@example.com', source: 'culinarycoach' });
   eq(rowFor('ci.a.twin@example.com')?.student_name, 'CI Student A (2)', 'a name already used by a cohort student gets a suffix instead of failing');
   eq(sql(`select level from public.student_access_codes where student_name = 'CI Student A'`), 'L1', 'the cohort student keeps their own level and code');
-  ok(c.status === 200 && !!c.body.code, 'the new learner still receives a code');
+  await wait(300);
+  ok(c.status === 200 && !!codeFromMail(await mail(), 'ci.a.twin@example.com'), 'the new learner still receives a code by e-mail');
 });
 
 R.section('Opting out');
 await t('optout', async () => {
   await reset();
   const e = await enroll({ name: 'Rae Stone', email: 'rae.stone@example.com', source: 'culinarycoach' });
+  await wait(300);
+  const raeCode = codeFromMail(await mail(), 'rae.stone@example.com');
+  ok(!!raeCode, 'Rae is e-mailed a code');
   const tok = rowFor('rae.stone@example.com').unsub_token;
   const bad = await fetch(`${API}/functions/v1/cst-enrollment?u=${'0'.repeat(48)}`);
   eq(bad.status, 404, 'an unknown unsubscribe token is refused');
@@ -126,12 +142,12 @@ await t('optout', async () => {
   const good = await fetch(`${API}/functions/v1/cst-enrollment?u=${tok}`);
   ok(good.status === 200 && /unsubscribed/i.test(await good.text()), 'the unsubscribe link works with one click');
   eq(rowFor('rae.stone@example.com').opted_out, true, 'opted_out is now true on the row');
-  const login = await fetch(`${API}/functions/v1/validate-login`, { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': freshIp() }, body: JSON.stringify({ access_code: e.body.code }) }).then(x => x.json());
+  const login = await fetch(`${API}/functions/v1/validate-login`, { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': freshIp() }, body: JSON.stringify({ access_code: raeCode }) }).then(x => x.json());
   ok(login.valid === true, 'unsubscribing stops e-mail only; the learner keeps their access');
   await reset();
   const re = await enroll({ name: 'Rae Stone', email: 'rae.stone@example.com', source: 'redshirtops' });
   await wait(400);
-  ok(re.status === 200 && !re.body.code, 'an opted-out address submitting the form again gets no new code');
+  ok(re.status === 200 && !('code' in (re.body || {})), 'an opted-out address submitting the form again gets no new code');
   eq((await mail()).length, 0, 'no e-mail at all is sent to or about an opted-out address');
   // an address that was opted out before it ever submitted the form this time (row created by hand with opted_out = true)
   sql(`select public.lms_set_code_level('Pre Optout', 'CI-PREOPT-CODE-1', false, 'cst-async')`);
@@ -139,7 +155,7 @@ await t('optout', async () => {
   await reset();
   const pre = await enroll({ name: 'Pre Optout', email: 'pre.optout@example.com', source: 'culinarycoach' });
   await wait(400);
-  ok(pre.status === 200 && !pre.body.code && (await mail()).length === 0, 'opted_out:true on an existing row means nothing is sent');
+  ok(pre.status === 200 && !('code' in (pre.body || {})) && (await mail()).length === 0, 'opted_out:true on an existing row means nothing is sent');
 });
 
 R.section('Throttle and failure handling');
