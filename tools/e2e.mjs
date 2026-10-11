@@ -924,6 +924,42 @@ R.section('Sync indicator: Saving, Saved, Offline');
   await s.ctx.close();
 }
 
+// ===== UDL / accessibility: keyboard access and screen-reader labeling =====
+R.section('Keyboard access and screen-reader labeling (UDL fixes)');
+{
+  const { page, ctx } = await newPage(browser, be);
+  await login(page, 'WRONG');
+  await page.waitForSelector('#login-error', { state: 'visible' });
+  ok((await page.locator('#login-error').getAttribute('role')) === 'alert', 'the login error is a role="alert" live region, so a screen reader announces it');
+  ok((await page.locator('#toast').getAttribute('role')) === 'status', 'the toast is a role="status" live region');
+
+  await login(page, 'MOCK-STU-F'); await appUp(page);
+  // sidebar nav built from "div onclick" is keyboard-focusable and Enter-activatable, not just clickable
+  await page.evaluate(() => document.querySelector('[data-page="krp"]').focus());
+  ok((await page.evaluate(() => document.activeElement.dataset.page)) === 'krp', 'a sidebar nav item can receive keyboard focus (Tab)');
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => document.getElementById('page-krp').classList.contains('active'));
+  ok(true, 'pressing Enter on a focused sidebar item activates it, the same as a click');
+
+  // day-card accordion: same retrofit, and it must not fight the existing aria-expanded bookkeeping
+  await page.evaluate(() => showPage('w1'));
+  const header = page.locator('.day-card-header').first();
+  await header.evaluate(el => el.focus());
+  ok((await header.getAttribute('tabindex')) === '0', 'a lesson-day accordion header is keyboard-focusable');
+  await page.keyboard.press(' ');
+  await page.waitForFunction(() => document.querySelector('.day-card-header').getAttribute('aria-expanded') === 'true');
+  ok(true, 'pressing Space on a focused accordion header opens it, the same as a click');
+
+  // a graded quiz option's correct/incorrect state is never color alone (w1d1 is already open from the Space press above)
+  await page.evaluate(() => QUIZ_BANK.w1d1.questions.forEach((q, i) => selectOption('w1d1', i, (q.ans + 1) % q.opts.length)));
+  await page.click('#qsub-w1d1');
+  await page.waitForTimeout(200);
+  const tags = await page.locator('.quiz-tag').allTextContents();
+  ok(tags.some(t => /Correct answer/.test(t)), 'the correct option is tagged "Correct answer" in text, not just colored green', JSON.stringify(tags));
+  ok(tags.some(t => /Your answer/.test(t)), 'a wrong chosen option is tagged "Your answer" in text, not just colored red', JSON.stringify(tags));
+  await ctx.close();
+}
+
 // ===== 9. responsive =====
 R.section('Mobile and responsive layout');
 for (const vp of [{ width: 375, height: 760 }, { width: 360, height: 740 }, { width: 768, height: 900 }]) {
