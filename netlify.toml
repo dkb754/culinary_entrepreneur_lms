@@ -10,6 +10,10 @@
     Referrer-Policy = "no-referrer"
     X-Frame-Options = "SAMEORIGIN"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    # Defense-in-depth against XSS and data exfiltration if an escaping bug ever slips in.
+    # 'unsafe-inline' is needed because the page's own JS/CSS is inline (no build step) — this still blocks
+    # loading any *external* script, blocks framing, and blocks forms/fetches from going anywhere but Supabase.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://mddvqxesxfifqxhuzhsi.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'self'"
 
 # Always revalidate the page so a deploy reaches students immediately.
 [[headers]]
