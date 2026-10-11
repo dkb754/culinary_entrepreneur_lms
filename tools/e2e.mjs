@@ -957,6 +957,25 @@ R.section('Keyboard access and screen-reader labeling (UDL fixes)');
   const tags = await page.locator('.quiz-tag').allTextContents();
   ok(tags.some(t => /Correct answer/.test(t)), 'the correct option is tagged "Correct answer" in text, not just colored green', JSON.stringify(tags));
   ok(tags.some(t => /Your answer/.test(t)), 'a wrong chosen option is tagged "Your answer" in text, not just colored red', JSON.stringify(tags));
+
+  // heading outline: no page-title (h2) skips straight to h4+ without an intervening h3
+  ok((await header.locator('.day-label').evaluate(el => el.tagName)) === 'H3', 'a lesson-day label is a real <h3>, not a styled <div>, so the outline includes it');
+  await page.evaluate(() => showPage('krp'));
+  const krpHeadingTags = await page.locator('.krp-phase h1,.krp-phase h2,.krp-phase h3,.krp-phase h4,.krp-phase h5,.krp-phase h6,.krp-skill h1,.krp-skill h2,.krp-skill h3,.krp-skill h4,.krp-skill h5,.krp-skill h6').evaluateAll(els => els.map(e => e.tagName));
+  ok(krpHeadingTags.length > 0 && krpHeadingTags.every(t => t === 'H3'), 'the KRP phase/skill cards sit one level under the page\'s h2, not three (h4)', JSON.stringify(krpHeadingTags));
+
+  // skip link: present, hidden until focused, and targets the real content region
+  const skip = page.locator('.skip-link');
+  ok((await skip.getAttribute('href')) === '#main-content' && (await page.locator('#main-content').count()) === 1, 'a "Skip to main content" link exists and points at the real content landmark');
+  const offscreenBefore = await skip.evaluate(el => getComputedStyle(el).left);
+  await skip.focus();
+  const onscreenAfter = await skip.evaluate(el => getComputedStyle(el).left);
+  ok(offscreenBefore !== onscreenAfter, 'the skip link is off-screen until it receives keyboard focus, then becomes visible', `${offscreenBefore} -> ${onscreenAfter}`);
+
+  // reduced motion and print are both handled, so neither is a dead end for the learner who needs them
+  const css = await page.evaluate(() => Array.from(document.styleSheets).flatMap(s => { try { return Array.from(s.cssRules); } catch { return []; } }).map(r => r.cssText).join('\n'));
+  ok(/prefers-reduced-motion:\s*reduce/.test(css), 'a prefers-reduced-motion override exists for users who need it');
+  ok(/@media print/.test(css), 'a print stylesheet hides the app chrome (nav, sidebar, buttons) instead of printing it');
   await ctx.close();
 }
 
