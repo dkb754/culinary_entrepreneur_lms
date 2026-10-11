@@ -237,7 +237,13 @@ R.section('Gates and dashboard (student)');
   ok(await page.locator('#ibm-banner').isVisible() && /premium access to IBM SkillsBuild/.test(await page.locator('#ibm-banner').innerText()), 'the dashboard shows the IBM SkillsBuild banner');
   await page.evaluate(() => showPage('ibm'));
   ok(await page.locator('#ibm-modal').isVisible() && /earned premium access to IBM SkillsBuild/.test(await page.locator('#ibm-modal').innerText()), 'the unlock message appears the first time');
-  await page.evaluate(() => document.getElementById('ibm-modal').remove());
+  ok(await page.evaluate(() => !!document.activeElement.closest('#ibm-modal')), 'opening the modal moves keyboard focus into it (UDL fix)');
+  const ibmFocusables = await page.locator('#ibm-modal a[href], #ibm-modal button').count();
+  for (let i = 0; i < ibmFocusables; i++) await page.keyboard.press('Tab');
+  ok(await page.evaluate(() => !!document.activeElement.closest('#ibm-modal')), 'Tab cycles focus within the modal instead of escaping it (focus trap)');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.getElementById('ibm-modal'));
+  ok(true, 'pressing Escape closes the modal (UDL fix)');
   const ibmLinks = await page.locator('#page-ibm a').evaluateAll(as => as.map(a => ({ t: a.textContent.trim(), h: a.href, tg: a.target })));
   ok(ibmLinks.length === 4 && ibmLinks[0].t === 'Register for IBM SkillsBuild' && ibmLinks[0].h === 'https://skills.yourlearning.ibm.com/?ngo-id=0427&mgr=5521635reg&mgr2=5440980reg&utm_campaign=culinarycoach', 'the registration link is listed first, then 3 courses', JSON.stringify(ibmLinks.map(l => l.t)));
   ok(['Lifelong Professional Skills', 'Collaboration', 'Job Readiness'].every((t, i) => ibmLinks[i + 1].t === t && ibmLinks[i + 1].h.endsWith('&utm_campaign=culinarycoach')), 'the three Level 1 courses carry the Culinary Coach tracking tags');
@@ -336,6 +342,42 @@ R.section('Instructor tools');
 }
 
 // ===== layout =====
+// ===== UDL / accessibility: keyboard access and screen-reader labeling =====
+R.section('Keyboard access and screen-reader labeling (UDL fixes)');
+{
+  const { page } = await newPage(browser, be);
+  await login(page, 'WRONG');
+  await page.waitForSelector('#login-error', { state: 'visible' });
+  ok((await page.locator('#login-error').getAttribute('role')) === 'alert', 'the login error is a role="alert" live region, so a screen reader announces it');
+  ok((await page.locator('#toast').getAttribute('role')) === 'status', 'the toast is a role="status" live region');
+
+  await login(page, 'MOCK-CST-B'); await appUp(page);
+  // sidebar nav built from "div onclick" is keyboard-focusable and Enter-activatable, not just clickable
+  await page.evaluate(() => document.querySelector('[data-page="krp"]').focus());
+  ok((await page.evaluate(() => document.activeElement.dataset.page)) === 'krp', 'a sidebar nav item can receive keyboard focus (Tab)');
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => document.getElementById('page-krp').classList.contains('active'));
+  ok(true, 'pressing Enter on a focused sidebar item activates it, the same as a click');
+
+  // day-card accordion: same retrofit, and it must not fight the existing aria-expanded bookkeeping
+  await page.evaluate(() => showPage('w1'));
+  const header = page.locator('.day-card-header').first();
+  await header.evaluate(el => el.focus());
+  ok((await header.getAttribute('tabindex')) === '0', 'a lesson-day accordion header is keyboard-focusable');
+  await page.keyboard.press(' ');
+  await page.waitForFunction(() => document.querySelector('.day-card-header').getAttribute('aria-expanded') === 'true');
+  ok(true, 'pressing Space on a focused accordion header opens it, the same as a click (w1d1 is now open)');
+
+  // a graded quiz option's correct/incorrect state is never color alone
+  await page.evaluate(() => QUIZ_BANK.w1d1.questions.forEach((q, i) => selectOption('w1d1', i, (q.ans + 1) % q.opts.length)));
+  await page.click('#qsub-w1d1');
+  await page.waitForTimeout(200);
+  const tags = await page.locator('.quiz-tag').allTextContents();
+  ok(tags.some(t => /Correct answer/.test(t)), 'the correct option is tagged "Correct answer" in text, not just colored green', JSON.stringify(tags));
+  ok(tags.some(t => /Your answer/.test(t)), 'a wrong chosen option is tagged "Your answer" in text, not just colored red', JSON.stringify(tags));
+  await page.context().close();
+}
+
 R.section('Phone and tablet layout');
 for (const vp of [{ width: 375, height: 760 }, { width: 768, height: 900 }]) {
   const { page, errors } = await newPage(browser, be, { viewport: vp });
