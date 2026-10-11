@@ -16,7 +16,7 @@ or any cohort data.
 Responses
 | Status | Body | Meaning |
 |---|---|---|
-| 200 | `{ "success": true, "code": "CST-2026-X7K2M9", "emails": {"applicant":"sent","notice":"sent"} }` | New learner. `emails` can also say `failed` or `not_configured`; the enrollment still stands. |
+| 200 | `{ "success": true, "emails": {"applicant":"sent","notice":"sent"} }` | New learner. The code is never in the response — see below — only in the e-mail. `emails` can also say `failed` or `not_configured`; the enrollment still stands. |
 | 200 | `{ "success": true }` | That e-mail is already enrolled or has opted out. No new code, no e-mail. |
 | 400 | `{ "success": false, "error": "bad_name" \| "bad_email" \| "bad_source" \| "bad_json" }` | Fix the form data. |
 | 429 | `{ "success": false, "error": "rate_limited" }` | More than 5 per visitor or 100 in total in an hour. |
@@ -42,7 +42,9 @@ fetch('https://mddvqxesxfifqxhuzhsi.supabase.co/functions/v1/cst-enrollment', {
 
 Differences from the written brief, on purpose:
 - The code is stored as a bcrypt hash like every other access code, so there is no readable `access_code` column. The only place the
-  code appears is the welcome e-mail, Duane's notice and the response to the form.
+  code appears is the welcome e-mail and Duane's notice — **never the response to the form.** Returning it there would let anyone
+  submit a form with someone else's e-mail address and read the code straight off the page, without that person ever seeing the
+  welcome e-mail, and would let a bot farm codes by submitting addresses it doesn't control.
 - `email` and `unsub_token` columns were added (the table had no e-mail column, and the unsubscribe link needs an unguessable token).
 - `enrolled_at` is empty for the 10 cohort rows (only new rows get a time).
 
@@ -60,7 +62,7 @@ Also, new learners appear in the course's Student Tracker as soon as they enrol.
 ## Needs Resend
 Set the `RESEND_API_KEY` secret and verify `culinarycoach.org` in Resend, so `duane@culinarycoach.org` and `noreply@culinarycoach.org` can send.
 Without the key, enrollment still works and the response shows `"emails": {"applicant":"not_configured", ...}`. The learner only gets
-their code if your form shows it from the response.
+their code by e-mail, so without `RESEND_API_KEY` configured they get no code at all — check Resend is set up before relying on this.
 
 ## Tests
 `tools/backend-tests-enrollment.mjs` runs in CI against the real function and a mock Resend server (`tools/mock-resend.mjs`).
