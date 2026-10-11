@@ -135,11 +135,12 @@ body {
   font-family: var(--font-body);
   font-size: 15px;
   margin-bottom: 16px;
-  outline: none;
   transition: border-color 0.2s;
 }
 
 .login-form input:focus { border-color: var(--gold); }
+/* keyboard-visible focus ring: the global :focus-visible rule alone loses to this selector's specificity */
+.login-form input:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 .login-form input::placeholder { color: rgba(255,255,255,0.3); }
 
 .btn-primary {
@@ -809,7 +810,8 @@ body {
 
 .quiz-option:hover:not(:disabled) { border-color: var(--green-bright); background: rgba(61,122,82,0.04); }
 .quiz-option.correct { border-color: var(--green-bright); background: rgba(61,122,82,0.08); color: var(--green-dark); font-weight: 600; }
-.quiz-option.wrong { border-color: #e05555; background: rgba(224,85,85,0.06); }
+.quiz-option.wrong { border-color: #e05555; background: rgba(224,85,85,0.06); color: #b23a3a; }
+.quiz-tag { font-size: 0.82em; font-weight: 700; }
 .quiz-option:disabled { cursor: default; }
 
 .quiz-feedback {
@@ -1566,7 +1568,7 @@ body {
       <input type="text" id="login-user" placeholder="Your name (optional)" />
       <label for="login-pass">Access Code</label>
       <input type="password" id="login-pass" placeholder="Provided by your instructor" />
-      <p class="error-msg" id="login-error">❌ Invalid credentials. Please check with your instructor.</p>
+      <p class="error-msg" id="login-error" role="alert">❌ Invalid credentials. Please check with your instructor.</p>
       <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign In →</button>
     </div>
     <div class="login-notice">Need help signing in? Contact your instructor.</div>
@@ -1633,7 +1635,7 @@ body {
   </div>
 </div>
 
-<div class="toast" id="toast">
+<div class="toast" id="toast" role="status" aria-live="polite">
   <span class="toast-icon" id="toast-icon">✓</span>
   <span id="toast-msg">Saved!</span>
 </div>
@@ -1659,6 +1661,31 @@ body {
 //   lms-api-v2      every read/write (progress, uploads, admin views) using that token
 // Course content lives in content/level1.js (curriculum + rubric) and content/level1-quizzes.js (quiz bank).
 // ============================================================
+
+// Keyboard access for every "div onclick" widget (sidebar nav, week cards, day accordions, …), present or future.
+// Rather than hand-adding role/tabindex/keydown to each of the dozens of innerHTML templates that build these,
+// watch the DOM and retrofit any clickable element that isn't already keyboard-operable the moment it's inserted.
+(function () {
+  function isNativelyFocusable(el) {
+    return /^(A|BUTTON|INPUT|SELECT|TEXTAREA)$/.test(el.tagName) || el.hasAttribute('tabindex');
+  }
+  function upgrade(el) {
+    if (!el.hasAttribute('onclick') || isNativelyFocusable(el)) return;
+    el.setAttribute('tabindex', '0');
+    if (!el.hasAttribute('role')) el.setAttribute('role', 'button');
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); el.click(); }
+    });
+  }
+  function scan(node) {
+    if (!node || node.nodeType !== 1) return;
+    if (node.matches && node.matches('[onclick]')) upgrade(node);
+    if (node.querySelectorAll) node.querySelectorAll('[onclick]').forEach(upgrade);
+  }
+  new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(scan))).observe(document.documentElement, { childList: true, subtree: true });
+  document.addEventListener('DOMContentLoaded', () => scan(document.body));
+})();
+
 const SUPABASE_URL = 'https://mddvqxesxfifqxhuzhsi.supabase.co';
 const FN_URL = SUPABASE_URL + '/functions/v1/';
 const API_FN = 'lms-api-v2';
@@ -1901,7 +1928,7 @@ function renderPrograms() {
     const live = open || link;
     const click = open ? `onclick="showPage('dashboard')"` : link ? `onclick="window.open('${esc(link)}','_blank','noopener')"` : '';
     const list = `<ul class="level-includes">${p.includes.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
-    return `<div class="level-card ${live ? 'unlocked' : 'locked'}${open ? ' current' : ''}" ${live ? `${click} role="button" tabindex="0" onkeydown="if(event.key==='Enter')this.click()"` : 'aria-disabled="true"'}>
+    return `<div class="level-card ${live ? 'unlocked' : 'locked'}${open ? ' current' : ''}" ${live ? click : 'aria-disabled="true"'}>
       <div class="level-icon ${p.iconClass}">${p.icon}</div>
       <div class="level-info">
         <div class="level-num">${esc(p.num)}</div>
@@ -2248,6 +2275,14 @@ function selectOption(quizId, qi, oi) {
   if (sub) sub.disabled = !all;
 }
 
+// Correct/incorrect must never rest on color alone (screen readers, color blindness) — tag the option text itself.
+function tagOption(btn, label) {
+  const s = document.createElement('span');
+  s.className = 'quiz-tag';
+  s.textContent = ' — ' + label;
+  btn.appendChild(s);
+}
+
 function submitQuiz(quizId) {
   const quiz = QUIZ_BANK[quizId];
   let correct = 0;
@@ -2259,8 +2294,8 @@ function submitQuiz(quizId) {
       const btn = document.getElementById(`qopt-${quizId}-${qi}-${oi}`);
       if (!btn) return;
       btn.disabled = true;
-      if (oi === q.ans) btn.classList.add('correct');
-      else if (oi === chosen && !isCorrect) btn.classList.add('wrong');
+      if (oi === q.ans) { btn.classList.add('correct'); tagOption(btn, 'Correct answer'); }
+      else if (oi === chosen && !isCorrect) { btn.classList.add('wrong'); tagOption(btn, 'Your answer'); }
     });
     const fb = document.getElementById(`qfb-${quizId}-${qi}`);
     if (fb) { fb.textContent = q.feedback; fb.className = 'quiz-feedback ' + (isCorrect ? 'correct-fb' : 'wrong-fb'); }
@@ -2293,7 +2328,7 @@ function applyQuizResults(id) {
   QUIZ_BANK[id].questions.forEach((q, qi) => {
     q.opts.forEach((_, oi) => {
       const btn = document.getElementById(`qopt-${id}-${qi}-${oi}`);
-      if (btn) { btn.disabled = true; if (oi === q.ans) btn.classList.add('correct'); }
+      if (btn) { btn.disabled = true; if (oi === q.ans) { btn.classList.add('correct'); tagOption(btn, 'Correct answer'); } }
     });
     const fb = document.getElementById(`qfb-${id}-${qi}`);
     if (fb) { fb.textContent = q.feedback; fb.className = 'quiz-feedback correct-fb'; }
