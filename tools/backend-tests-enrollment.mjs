@@ -88,6 +88,11 @@ await t('validation', async () => {
   eq(rowFor('devon.hall@example.com')?.source, 'redshirtops', 'the redshirtops source is recorded');
   await wait(300);
   ok((await mail()).some(m => (m.text || '').includes('Source: redshirtops.com')), 'Duane\'s notice shows redshirtops.com', JSON.stringify(rs));
+
+  const rc = await enroll({ name: 'Circle Lead', email: 'circle.lead@example.com', source: 'circle' });
+  eq(rowFor('circle.lead@example.com')?.source, 'circle', 'the circle source is recorded');
+  await wait(300);
+  ok((await mail()).some(m => (m.text || '').includes('Source: Circle Resource Needs Check-In')), 'Duane\'s notice shows the Circle Resource Needs Check-In label', JSON.stringify(rc));
   for (const [label, body] of [['no name', { email: 'a@b.co', source: 'culinarycoach' }], ['bad e-mail', { name: 'Test Person', email: 'nope', source: 'culinarycoach' }], ['bad source', { name: 'Test Person', email: 'p@example.com', source: 'facebook' }], ['name with markup', { name: '<script>x</script>', email: 'q@example.com', source: 'culinarycoach' }]]) {
     const r = await enroll(body);
     ok(r.status === 400 && r.body.success === false, `${label} is rejected with 400`, JSON.stringify(r));

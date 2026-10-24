@@ -10,7 +10,10 @@ or any cohort data.
 ```json
 { "name": "Maya Brooks", "email": "maya@example.com", "source": "culinarycoach" }
 ```
-- `name` 2–60 letters (spaces . ' - allowed), `email` valid address, `source` is `"culinarycoach"` or `"redshirtops"`.
+- `name` 2–60 letters (spaces . ' - allowed), `email` valid address, `source` is `"culinarycoach"`, `"redshirtops"`, or `"circle"`.
+- `"circle"` is for leads referred from the Circle Resource Needs Check-In (a separate reentry-support outreach form/sheet,
+  not culinarycoach.org or redshirtops.com) — kept as its own source so that population stays distinguishable in reporting
+  from the two public-form sources. Only server-side callers use it (the CORS allowlist below is for browser forms only).
 - Optional hidden field `"website"`: leave it empty. Bots fill it in and are silently ignored.
 
 Responses

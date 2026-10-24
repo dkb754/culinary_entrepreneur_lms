@@ -1,4 +1,6 @@
-// POST /functions/v1/cst-enrollment   { name, email, source: "culinarycoach" | "redshirtops" }
+// POST /functions/v1/cst-enrollment   { name, email, source: "culinarycoach" | "redshirtops" | "circle" }
+//   "circle" = a lead from the Circle Resource Needs Check-In (a separate reentry-support outreach form),
+//   kept as its own source value so that referral population stays distinguishable from the two public forms.
 //   -> { success: true, emails: { applicant: "sent"|"failed"|"not_configured", notice: ... } }
 //   The access code is never echoed back in the response — only e-mailed to the address given. This keeps a public
 //   form from being used to harvest codes for e-mail addresses the caller doesn't control, or to generate codes for
@@ -21,7 +23,7 @@ const RESEND_URL = Deno.env.get("ENROLLMENT_RESEND_API_URL") || "https://api.res
 const FROM_APPLICANT = "Chef Duane Brown <duane@culinarycoach.org>";
 const FROM_NOTICE = "noreply@culinarycoach.org";
 const DUANE = "duane@culinarycoach.org";
-const SOURCE_LABEL: Record<string, string> = { culinarycoach: "culinarycoach.org", redshirtops: "redshirtops.com" };
+const SOURCE_LABEL: Record<string, string> = { culinarycoach: "culinarycoach.org", redshirtops: "redshirtops.com", circle: "Circle Resource Needs Check-In" };
 const ORIGINS = new Set(["https://culinarycoach.org", "https://www.culinarycoach.org", "https://redshirtops.com", "https://www.redshirtops.com"]);
 const MAX_PER_IP_HOUR = 5;
 const MAX_TOTAL_HOUR = 100;
